@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -88,7 +87,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
       processor: processors[Math.floor(Math.random() * processors.length)],
       ram: ramOptions[Math.floor(Math.random() * ramOptions.length)],
       storage: storageOptions[Math.floor(Math.random() * storageOptions.length)],
-      tpmVersion: tmpVersions[Math.floor(Math.random() * tmpVersions.length)],
+      tpmVersion: tpmVersions[Math.floor(Math.random() * tpmVersions.length)],
       secureBootCapable: Math.random() > 0.3,
       uefiCapable: Math.random() > 0.2,
       directxVersion: Math.random() > 0.4 ? '12' : '11',
@@ -121,7 +120,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
       tpm: {
         met: systemInfo.tpmVersion === '2.0',
         requirement: 'TPM version 2.0 (Trusted Platform Module)',
-        current: systemInfo.tmpVersion === 'Not Detected' ? 'TPM not detected' : `TPM ${systemInfo.tmpVersion}`
+        current: systemInfo.tpmVersion === 'Not Detected' ? 'TPM not detected' : `TPM ${systemInfo.tpmVersion}`
       },
       secureBoot: {
         met: systemInfo.secureBootCapable,
