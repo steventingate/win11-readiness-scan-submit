@@ -182,7 +182,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
   return (
     <Card className="max-w-2xl mx-auto bg-white/95 backdrop-blur-sm border-2">
       <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-2 text-blue-800">
+        <CardTitle className="flex items-center justify-center gap-2 text-primary">
           <Computer className="h-6 w-6" />
           Professional System Analysis
         </CardTitle>
@@ -193,8 +193,8 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
       <CardContent className="space-y-6">
         {!isScanning ? (
           <div className="text-center space-y-4">
-            <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-              <h3 className="font-semibold mb-3 text-blue-800">Complete System Assessment:</h3>
+            <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
+              <h3 className="font-semibold mb-3 text-primary">Complete System Assessment:</h3>
               <ul className="text-sm space-y-2 text-left max-w-md mx-auto text-gray-700">
                 <li>• Device identification & warranty status</li>
                 <li>• Processor & memory compatibility</li>
@@ -207,7 +207,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
             <Button 
               onClick={startScan}
               size="lg"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Scan className="h-5 w-5 mr-2" />
               Begin Professional System Scan
@@ -219,8 +219,8 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
         ) : (
           <div className="space-y-4">
             <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="font-medium text-lg text-blue-800">Analyzing your system...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+              <p className="font-medium text-lg text-primary">Analyzing your system...</p>
               <p className="text-sm text-gray-600">{currentStep}</p>
             </div>
             <Progress value={scanProgress} className="w-full" />

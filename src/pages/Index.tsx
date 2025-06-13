@@ -73,13 +73,13 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600">
+    <div className="min-h-screen bg-gradient-to-br from-orange-900 via-orange-800 to-orange-600">
       {/* Header */}
       <div className="bg-white shadow-lg">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Computer className="h-8 w-8 text-blue-600" />
+              <Computer className="h-8 w-8 text-primary" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Helpdesk Computers</h1>
                 <p className="text-sm text-gray-600">Windows 11 Compatibility Assessment</p>
@@ -87,7 +87,7 @@ const Index = () => {
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Professional IT Solutions</p>
-              <p className="text-xs text-blue-600">helpdeskcomputers.com.au</p>
+              <p className="text-xs text-primary">helpdeskcomputers.com.au</p>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ const Index = () => {
           <h2 className="text-4xl font-bold text-white mb-4">
             Windows 11 Compatibility Checker
           </h2>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-orange-100 max-w-2xl mx-auto">
             Comprehensive system analysis to determine Windows 11 readiness with detailed device information and warranty status
           </p>
         </div>
@@ -112,7 +112,7 @@ const Index = () => {
             {systemInfo && (
               <Card className="border-2 bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <CardTitle className="flex items-center gap-2 text-primary">
                     <Computer className="h-5 w-5" />
                     Device Information
                   </CardTitle>
@@ -184,7 +184,7 @@ const Index = () => {
             {/* Detailed Requirements */}
             <Card className="bg-white/95 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800">
+                <CardTitle className="flex items-center gap-2 text-primary">
                   <Monitor className="h-5 w-5" />
                   System Requirements Analysis
                 </CardTitle>
@@ -224,7 +224,7 @@ const Index = () => {
               <Button 
                 onClick={handleProceedToForm}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 {compatibilityResult?.isCompatible 
                   ? "Request Windows 11 Upgrade Service" 
@@ -235,7 +235,7 @@ const Index = () => {
                 onClick={resetScanner}
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white hover:text-blue-800"
+                className="border-white text-white hover:bg-white hover:text-primary"
               >
                 Scan Another Device
               </Button>
@@ -245,12 +245,12 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <div className="mt-16 bg-blue-900/50 backdrop-blur-sm">
+      <div className="mt-16 bg-orange-900/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-6 text-center">
-          <p className="text-blue-100 text-sm">
+          <p className="text-orange-100 text-sm">
             © 2024 Helpdesk Computers - Professional IT Solutions & Support
           </p>
-          <p className="text-blue-200 text-xs mt-2">
+          <p className="text-orange-200 text-xs mt-2">
             Visit us at <span className="font-medium">helpdeskcomputers.com.au</span> for comprehensive IT services
           </p>
         </div>
