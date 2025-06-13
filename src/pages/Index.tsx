@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Monitor, Cpu, HardDrive, MemoryStick, Shield, Wifi, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, MemoryStick, Shield, Wifi, CheckCircle, XCircle, Loader2, Computer } from 'lucide-react';
 import SystemScanner from '@/components/SystemScanner';
 import UserForm from '@/components/UserForm';
 
@@ -17,6 +17,11 @@ export interface SystemInfo {
   directxVersion: string;
   displayResolution: string;
   internetConnection: boolean;
+  serialNumber: string;
+  model: string;
+  manufacturer: string;
+  warrantyStatus: 'In Warranty' | 'Out of Warranty' | 'Unknown' | 'Extended Warranty';
+  warrantyExpiry?: string;
 }
 
 export interface CompatibilityResult {
@@ -37,10 +42,12 @@ export interface CompatibilityResult {
 const Index = () => {
   const [scanComplete, setScanComplete] = useState(false);
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const handleScanComplete = (result: CompatibilityResult) => {
+  const handleScanComplete = (result: CompatibilityResult, info: SystemInfo) => {
     setCompatibilityResult(result);
+    setSystemInfo(info);
     setScanComplete(true);
   };
 
@@ -51,28 +58,49 @@ const Index = () => {
   const resetScanner = () => {
     setScanComplete(false);
     setCompatibilityResult(null);
+    setSystemInfo(null);
     setShowForm(false);
   };
 
-  if (showForm && compatibilityResult) {
+  if (showForm && compatibilityResult && systemInfo) {
     return (
       <UserForm 
         isCompatible={compatibilityResult.isCompatible}
+        systemInfo={systemInfo}
         onBack={() => setShowForm(false)}
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8 pt-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600">
+      {/* Header */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Computer className="h-8 w-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Helpdesk Computers</h1>
+                <p className="text-sm text-gray-600">Windows 11 Compatibility Assessment</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Professional IT Solutions</p>
+              <p className="text-xs text-blue-600">helpdeskcomputers.com.au</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Main Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold text-white mb-4">
             Windows 11 Compatibility Checker
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Check if your current device meets Windows 11 system requirements and get personalized recommendations
+          </h2>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+            Comprehensive system analysis to determine Windows 11 readiness with detailed device information and warranty status
           </p>
         </div>
 
@@ -80,8 +108,55 @@ const Index = () => {
           <SystemScanner onScanComplete={handleScanComplete} />
         ) : (
           <div className="space-y-6">
+            {/* Device Information Card */}
+            {systemInfo && (
+              <Card className="border-2 bg-white/95 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-blue-800">
+                    <Computer className="h-5 w-5" />
+                    Device Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div>
+                        <span className="font-medium text-gray-700">Manufacturer:</span>
+                        <span className="ml-2 text-gray-900">{systemInfo.manufacturer}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Model:</span>
+                        <span className="ml-2 text-gray-900">{systemInfo.model}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Serial Number:</span>
+                        <span className="ml-2 font-mono text-gray-900">{systemInfo.serialNumber}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-700">Warranty Status:</span>
+                        <Badge 
+                          variant={systemInfo.warrantyStatus === 'In Warranty' ? 'default' : 
+                                  systemInfo.warrantyStatus === 'Extended Warranty' ? 'secondary' : 'destructive'}
+                        >
+                          {systemInfo.warrantyStatus}
+                        </Badge>
+                      </div>
+                      {systemInfo.warrantyExpiry && (
+                        <div>
+                          <span className="font-medium text-gray-700">Warranty Expires:</span>
+                          <span className="ml-2 text-gray-900">{systemInfo.warrantyExpiry}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Results Overview */}
-            <Card className="border-2">
+            <Card className="border-2 bg-white/95 backdrop-blur-sm">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
                   {compatibilityResult?.isCompatible ? (
@@ -92,32 +167,32 @@ const Index = () => {
                 </div>
                 <CardTitle className="text-2xl">
                   {compatibilityResult?.isCompatible ? (
-                    <span className="text-green-600">Compatible with Windows 11!</span>
+                    <span className="text-green-600">Windows 11 Compatible!</span>
                   ) : (
-                    <span className="text-red-600">Not Compatible with Windows 11</span>
+                    <span className="text-red-600">Windows 11 Upgrade Required</span>
                   )}
                 </CardTitle>
                 <CardDescription className="text-lg">
                   {compatibilityResult?.isCompatible 
-                    ? "Your device meets all the minimum requirements for Windows 11."
-                    : "Your device doesn't meet some requirements. We can help you find a new device."
+                    ? "Your device meets all Windows 11 system requirements."
+                    : "Your device requires hardware upgrades or replacement for Windows 11."
                   }
                 </CardDescription>
               </CardHeader>
             </Card>
 
             {/* Detailed Requirements */}
-            <Card>
+            <Card className="bg-white/95 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-blue-800">
                   <Monitor className="h-5 w-5" />
-                  System Requirements Check
+                  System Requirements Analysis
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
                   {compatibilityResult && Object.entries(compatibilityResult.requirements).map(([key, req]) => (
-                    <div key={key} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={key} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
                       <div className="flex items-center gap-3">
                         {getRequirementIcon(key)}
                         <div>
@@ -149,23 +224,36 @@ const Index = () => {
               <Button 
                 onClick={handleProceedToForm}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {compatibilityResult?.isCompatible 
-                  ? "Request Windows 11 Upgrade" 
-                  : "Request New Device Quote"
+                  ? "Request Windows 11 Upgrade Service" 
+                  : "Request Hardware Upgrade Quote"
                 }
               </Button>
               <Button 
                 onClick={resetScanner}
                 variant="outline"
                 size="lg"
+                className="border-white text-white hover:bg-white hover:text-blue-800"
               >
                 Scan Another Device
               </Button>
             </div>
           </div>
         )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-16 bg-blue-900/50 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 py-6 text-center">
+          <p className="text-blue-100 text-sm">
+            © 2024 Helpdesk Computers - Professional IT Solutions & Support
+          </p>
+          <p className="text-blue-200 text-xs mt-2">
+            Visit us at <span className="font-medium">helpdeskcomputers.com.au</span> for comprehensive IT services
+          </p>
+        </div>
       </div>
     </div>
   );

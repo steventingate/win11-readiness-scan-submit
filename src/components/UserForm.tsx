@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, CheckCircle, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Send, Computer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SystemInfo } from '@/pages/Index';
 
 interface UserFormProps {
   isCompatible: boolean;
+  systemInfo: SystemInfo;
   onBack: () => void;
 }
 
@@ -22,7 +24,7 @@ interface FormData {
   additionalNotes: string;
 }
 
-const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
+const UserForm = ({ isCompatible, systemInfo, onBack }: UserFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -66,24 +68,28 @@ const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      console.log('Submitting form data:', {
+      // Prepare submission data with system information
+      const submissionData = {
         ...formData,
-        requestType: isCompatible ? 'windows_11_upgrade' : 'new_device_quote',
-        timestamp: new Date().toISOString()
-      });
+        systemInfo,
+        requestType: isCompatible ? 'windows_11_upgrade' : 'hardware_upgrade_quote',
+        timestamp: new Date().toISOString(),
+        source: 'Helpdesk Computers - Windows 11 Compatibility Checker'
+      };
+
+      console.log('Submitting enhanced form data:', submissionData);
 
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       setIsSubmitted(true);
       toast({
         title: "Request submitted successfully!",
-        description: "We'll contact you within 1-2 business days."
+        description: "Our technical team will contact you within 1-2 business days."
       });
     } catch (error) {
       toast({
         title: "Submission failed",
-        description: "Please try again or contact us directly.",
+        description: "Please try again or contact us directly at helpdeskcomputers.com.au",
         variant: "destructive"
       });
     } finally {
@@ -93,26 +99,52 @@ const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <div className="max-w-2xl mx-auto pt-16">
-          <Card className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600">
+        {/* Header */}
+        <div className="bg-white shadow-lg">
+          <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="flex items-center space-x-4">
+              <Computer className="h-8 w-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Helpdesk Computers</h1>
+                <p className="text-sm text-gray-600">Professional IT Solutions</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto pt-16 px-4">
+          <Card className="text-center bg-white/95 backdrop-blur-sm">
             <CardContent className="pt-12 pb-12">
               <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold mb-4">Request Submitted Successfully!</h2>
+              <h2 className="text-2xl font-bold mb-4 text-blue-800">Request Submitted Successfully!</h2>
               <p className="text-gray-600 mb-6">
-                Thank you for your interest. Our team will review your request and contact you within 1-2 business days.
+                Thank you for choosing Helpdesk Computers. Our technical team will review your system information and contact you within 1-2 business days with a comprehensive solution.
               </p>
-              <div className="space-y-2 text-sm text-gray-500">
-                <p>Request Type: {isCompatible ? 'Windows 11 Upgrade' : 'New Device Quote'}</p>
-                <p>Contact Email: {formData.email}</p>
-                <p>Customer Type: {formData.customerType === 'business' ? 'Business' : 'Residential'}</p>
+              
+              <div className="bg-blue-50 p-4 rounded-lg mb-6 text-left">
+                <h3 className="font-semibold text-blue-800 mb-3">Submission Summary:</h3>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p><span className="font-medium">Service Type:</span> {isCompatible ? 'Windows 11 Upgrade Service' : 'Hardware Upgrade Consultation'}</p>
+                  <p><span className="font-medium">Device:</span> {systemInfo.manufacturer} {systemInfo.model}</p>
+                  <p><span className="font-medium">Serial Number:</span> {systemInfo.serialNumber}</p>
+                  <p><span className="font-medium">Contact Email:</span> {formData.email}</p>
+                  <p><span className="font-medium">Customer Type:</span> {formData.customerType === 'business' ? 'Business' : 'Residential'}</p>
+                  <p><span className="font-medium">Warranty Status:</span> {systemInfo.warrantyStatus}</p>
+                </div>
               </div>
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-blue-600 font-medium">Visit us at helpdeskcomputers.com.au</p>
+                <p className="text-xs text-gray-500">For immediate assistance, please call our support team</p>
+              </div>
+
               <Button 
                 onClick={() => window.location.reload()}
-                className="mt-8"
+                className="mt-8 bg-blue-600 hover:bg-blue-700"
                 size="lg"
               >
-                Check Another Device
+                Analyze Another Device
               </Button>
             </CardContent>
           </Card>
@@ -122,30 +154,53 @@ const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-2xl mx-auto pt-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600">
+      {/* Header */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center space-x-4">
+            <Computer className="h-8 w-8 text-blue-600" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Helpdesk Computers</h1>
+              <p className="text-sm text-gray-600">Professional IT Solutions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto pt-8 px-4">
         <Button 
           onClick={onBack}
           variant="ghost"
-          className="mb-6"
+          className="mb-6 text-white hover:bg-white/10"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Results
         </Button>
 
-        <Card>
+        <Card className="bg-white/95 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-2xl">
-              {isCompatible ? 'Request Windows 11 Upgrade' : 'Request New Device Quote'}
+            <CardTitle className="text-2xl text-blue-800">
+              {isCompatible ? 'Windows 11 Upgrade Service Request' : 'Hardware Upgrade Consultation Request'}
             </CardTitle>
             <CardDescription>
               {isCompatible 
-                ? 'Great! Your device is compatible. Let us help you upgrade to Windows 11.'
-                : 'Your current device isn\'t compatible, but we can help you find the perfect new device.'
+                ? 'Let our certified technicians handle your Windows 11 upgrade professionally.'
+                : 'Our IT specialists will provide you with the best hardware upgrade options for Windows 11 compatibility.'
               }
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Device Summary */}
+            <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-200">
+              <h3 className="font-semibold text-blue-800 mb-2">Device Information:</h3>
+              <div className="text-sm space-y-1 text-gray-700">
+                <p><span className="font-medium">Device:</span> {systemInfo.manufacturer} {systemInfo.model}</p>
+                <p><span className="font-medium">Serial:</span> {systemInfo.serialNumber}</p>
+                <p><span className="font-medium">Warranty:</span> {systemInfo.warrantyStatus}</p>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Field */}
               <div className="space-y-2">
@@ -194,25 +249,25 @@ const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="residential" id="residential" />
-                    <Label htmlFor="residential">Residential</Label>
+                    <Label htmlFor="residential">Residential Customer</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="business" id="business" />
-                    <Label htmlFor="business">Business</Label>
+                    <Label htmlFor="business">Business Customer</Label>
                   </div>
                 </RadioGroup>
               </div>
 
               {/* Additional Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Additional Information (Optional)</Label>
+                <Label htmlFor="notes">Additional Requirements (Optional)</Label>
                 <Textarea
                   id="notes"
                   value={formData.additionalNotes}
                   onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
                   placeholder={isCompatible 
-                    ? "Any specific requirements or questions about the Windows 11 upgrade?"
-                    : "Tell us about your computing needs, budget range, or any specific requirements for your new device."
+                    ? "Any specific requirements for the Windows 11 upgrade? (e.g., preferred scheduling, data backup needs, software compatibility concerns)"
+                    : "Tell us about your usage requirements, budget considerations, or specific software needs for your new Windows 11 compatible system."
                   }
                   rows={4}
                 />
@@ -221,7 +276,7 @@ const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full"
+                className="w-full bg-blue-600 hover:bg-blue-700"
                 size="lg"
                 disabled={isSubmitting}
               >
@@ -233,13 +288,14 @@ const UserForm = ({ isCompatible, onBack }: UserFormProps) => {
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Submit Request
+                    Submit Service Request
                   </>
                 )}
               </Button>
 
               <p className="text-xs text-gray-500 text-center">
-                By submitting this form, you agree to be contacted regarding your {isCompatible ? 'upgrade' : 'device'} request.
+                By submitting this form, you agree to be contacted by Helpdesk Computers regarding your {isCompatible ? 'upgrade service' : 'hardware consultation'} request.
+                Visit <span className="font-medium">helpdeskcomputers.com.au</span> for more information.
               </p>
             </form>
           </CardContent>
