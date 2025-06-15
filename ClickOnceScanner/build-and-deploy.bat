@@ -9,15 +9,15 @@ if exist "publish" rmdir /s /q "publish"
 
 :: Restore packages
 echo Restoring NuGet packages...
-dotnet restore
+dotnet restore Win11Scanner.csproj
 
 :: Build the application
 echo Building application...
-dotnet build --configuration Release
+dotnet build Win11Scanner.csproj --configuration Release
 
 :: Publish as ClickOnce
 echo Publishing ClickOnce application...
-dotnet publish --configuration Release --runtime win-x64 --self-contained false
+dotnet publish Win11Scanner.csproj --configuration Release --runtime win-x64 --self-contained false
 
 echo.
 echo Build completed! 
