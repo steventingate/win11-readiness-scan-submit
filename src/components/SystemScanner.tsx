@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Loader2, Scan, Computer } from 'lucide-react';
 import { SystemInfo, CompatibilityResult } from '@/pages/Index';
+import { AlertCircle } from "lucide-react";
 
 interface SystemScannerProps {
   onScanComplete: (result: CompatibilityResult, systemInfo: SystemInfo) => void;
@@ -29,6 +30,15 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
     'Measuring display specifications...',
     'Testing network connectivity...'
   ];
+
+  const SimulatedNotice = () => (
+    <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-300 rounded p-3 mb-4">
+      <AlertCircle className="h-5 w-5 text-yellow-600" />
+      <span className="text-yellow-800 text-sm">
+        <strong>Note:</strong> Actual device information cannot be reliably detected from the browser. The system scan provides a simulated estimate for demonstration purposes.
+      </span>
+    </div>
+  );
 
   const detectActualSystemInfo = async (): Promise<SystemInfo> => {
     let manufacturer = 'Unknown';
@@ -339,6 +349,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
       <CardContent className="space-y-6">
         {!isScanning ? (
           <div className="text-center space-y-4">
+            <SimulatedNotice />
             <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
               <h3 className="font-semibold mb-3 text-primary">Complete System Assessment:</h3>
               <ul className="text-sm space-y-2 text-left max-w-md mx-auto text-gray-700">

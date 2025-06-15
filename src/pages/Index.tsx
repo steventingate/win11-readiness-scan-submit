@@ -5,6 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Monitor, Cpu, HardDrive, MemoryStick, Shield, Wifi, CheckCircle, XCircle, Loader2, Computer } from 'lucide-react';
 import SystemScanner from '@/components/SystemScanner';
 import UserForm from '@/components/UserForm';
+import DeviceInfoCard from "@/components/DeviceInfoCard";
+import ResultOverviewCard from "@/components/ResultOverviewCard";
+import RequirementsAnalysisCard from "@/components/RequirementsAnalysisCard";
 
 export interface SystemInfo {
   processor: string;
@@ -113,118 +116,10 @@ const Index = () => {
           <SystemScanner onScanComplete={handleScanComplete} />
         ) : (
           <div className="space-y-6">
-            {/* Device Information Card */}
-            {systemInfo && (
-              <Card className="border-2 bg-white/95 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-primary">
-                    <Computer className="h-5 w-5" />
-                    Device Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <div>
-                        <span className="font-medium text-gray-700">Manufacturer:</span>
-                        <span className="ml-2 text-gray-900">{systemInfo.manufacturer}</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Model:</span>
-                        <span className="ml-2 text-gray-900">{systemInfo.model}</span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Serial Number:</span>
-                        <span className="ml-2 font-mono text-gray-900">{systemInfo.serialNumber}</span>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-700">Warranty Status:</span>
-                        <Badge 
-                          variant={systemInfo.warrantyStatus === 'In Warranty' ? 'default' : 
-                                  systemInfo.warrantyStatus === 'Extended Warranty' ? 'secondary' : 'destructive'}
-                        >
-                          {systemInfo.warrantyStatus}
-                        </Badge>
-                      </div>
-                      {systemInfo.warrantyExpiry && (
-                        <div>
-                          <span className="font-medium text-gray-700">Warranty Expires:</span>
-                          <span className="ml-2 text-gray-900">{systemInfo.warrantyExpiry}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Results Overview */}
-            <Card className="border-2 bg-white/95 backdrop-blur-sm">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  {compatibilityResult?.isCompatible ? (
-                    <CheckCircle className="h-16 w-16 text-green-500" />
-                  ) : (
-                    <XCircle className="h-16 w-16 text-red-500" />
-                  )}
-                </div>
-                <CardTitle className="text-2xl">
-                  {compatibilityResult?.isCompatible ? (
-                    <span className="text-green-600">Windows 11 Compatible!</span>
-                  ) : (
-                    <span className="text-red-600">Windows 11 Upgrade Required</span>
-                  )}
-                </CardTitle>
-                <CardDescription className="text-lg">
-                  {compatibilityResult?.isCompatible 
-                    ? "Your device meets all Windows 11 system requirements."
-                    : "Your device requires hardware upgrades or replacement for Windows 11."
-                  }
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            {/* Detailed Requirements */}
-            <Card className="bg-white/95 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary">
-                  <Monitor className="h-5 w-5" />
-                  System Requirements Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  {compatibilityResult && Object.entries(compatibilityResult.requirements).map(([key, req]) => (
-                    <div key={key} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
-                      <div className="flex items-center gap-3">
-                        {getRequirementIcon(key)}
-                        <div>
-                          <div className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</div>
-                          <div className="text-sm text-gray-600">{req.requirement}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <div className="text-sm font-medium">{req.current}</div>
-                        </div>
-                        <Badge variant={req.met ? "default" : "destructive"} className="ml-2">
-                          {req.met ? (
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                          ) : (
-                            <XCircle className="h-3 w-3 mr-1" />
-                          )}
-                          {req.met ? "Met" : "Not Met"}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
+            {systemInfo && <DeviceInfoCard systemInfo={systemInfo} />}
+            <ResultOverviewCard isCompatible={compatibilityResult?.isCompatible} />
+            {compatibilityResult && <RequirementsAnalysisCard compatibilityResult={compatibilityResult} />}
+            {/* Action Buttons remain as before */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={handleProceedToForm}
