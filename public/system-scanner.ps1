@@ -59,7 +59,7 @@ try {
         processor = $processor.Name.Trim()
         ram = [Math]::Round($memory.Sum / 1GB)
         storage = [Math]::Round($disk.Size / 1GB)
-        tpmVersion = if ($tpm -and $tmp.SpecVersion) { $tpm.SpecVersion } elseif ($tpm) { "2.0" } else { "Not Detected" }
+        tmpVersion = if ($tpm -and $tpm.SpecVersion) { $tmp.SpecVersion } elseif ($tpm) { "2.0" } else { "Not Detected" }
         secureBootCapable = $secureBootEnabled
         uefiCapable = $uefiEnabled
         directxVersion = "12" # Most modern systems support DX12

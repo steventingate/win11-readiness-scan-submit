@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,7 +46,7 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
             processor: scanData.processor,
             ram: scanData.ram_gb,
             storage: scanData.storage_gb,
-            tpmVersion: scanData.tpm_version,
+            tmpVersion: scanData.tmp_version,
             secureBootCapable: scanData.secure_boot_capable,
             uefiCapable: scanData.uefi_capable,
             directxVersion: scanData.directx_version,
@@ -89,8 +88,8 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
         requirement: '64 GB available storage minimum',
         current: `${systemInfo.storage} GB`
       },
-      tpm: {
-        met: systemInfo.tpmVersion === '2.0',
+      tmp: {
+        met: systemInfo.tmpVersion === '2.0',
         requirement: 'TPM version 2.0 (Trusted Platform Module)',
         current: systemInfo.tmpVersion === 'Not Detected' ? 'TPM not detected' : `TPM ${systemInfo.tmpVersion}`
       },

@@ -14,7 +14,7 @@ interface SystemScanData {
   processor: string;
   ram: number;
   storage: number;
-  tpmVersion: string;
+  tmpVersion: string;
   secureBootCapable: boolean;
   uefiCapable: boolean;
   directxVersion: string;
@@ -48,7 +48,7 @@ serve(async (req) => {
         processor: scanData.processor,
         ram_gb: scanData.ram,
         storage_gb: scanData.storage,
-        tpm_version: scanData.tmpVersion,
+        tmp_version: scanData.tmpVersion,
         secure_boot_capable: scanData.secureBootCapable,
         uefi_capable: scanData.uefiCapable,
         directx_version: scanData.directxVersion,
@@ -75,7 +75,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: 200,
       },
     )
   }

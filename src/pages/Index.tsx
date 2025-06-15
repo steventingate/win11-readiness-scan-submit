@@ -14,7 +14,7 @@ export interface SystemInfo {
   processor: string;
   ram: number;
   storage: number;
-  tpmVersion: string;
+  tmpVersion: string;
   secureBootCapable: boolean;
   uefiCapable: boolean;
   directxVersion: string;
@@ -33,7 +33,7 @@ export interface CompatibilityResult {
     processor: { met: boolean; requirement: string; current: string };
     ram: { met: boolean; requirement: string; current: string };
     storage: { met: boolean; requirement: string; current: string };
-    tpm: { met: boolean; requirement: string; current: string };
+    tmp: { met: boolean; requirement: string; current: string };
     secureBoot: { met: boolean; requirement: string; current: string };
     uefi: { met: boolean; requirement: string; current: string };
     directx: { met: boolean; requirement: string; current: string };
@@ -168,7 +168,7 @@ const getRequirementIcon = (requirement: string) => {
       return <MemoryStick className="h-5 w-5 text-green-500" />;
     case 'storage':
       return <HardDrive className="h-5 w-5 text-purple-500" />;
-    case 'tpm':
+    case 'tmp':
     case 'secureBoot':
     case 'uefi':
       return <Shield className="h-5 w-5 text-red-500" />;

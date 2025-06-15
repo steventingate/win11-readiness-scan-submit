@@ -9,7 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      system_scans: {
+        Row: {
+          created_at: string
+          directx_version: string | null
+          display_resolution: string | null
+          id: string
+          internet_connection: boolean | null
+          manufacturer: string | null
+          model: string | null
+          processor: string | null
+          ram_gb: number | null
+          secure_boot_capable: boolean | null
+          serial_number: string | null
+          session_id: string
+          storage_gb: number | null
+          tmp_version: string | null
+          uefi_capable: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          directx_version?: string | null
+          display_resolution?: string | null
+          id?: string
+          internet_connection?: boolean | null
+          manufacturer?: string | null
+          model?: string | null
+          processor?: string | null
+          ram_gb?: number | null
+          secure_boot_capable?: boolean | null
+          serial_number?: string | null
+          session_id: string
+          storage_gb?: number | null
+          tmp_version?: string | null
+          uefi_capable?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          directx_version?: string | null
+          display_resolution?: string | null
+          id?: string
+          internet_connection?: boolean | null
+          manufacturer?: string | null
+          model?: string | null
+          processor?: string | null
+          ram_gb?: number | null
+          secure_boot_capable?: boolean | null
+          serial_number?: string | null
+          session_id?: string
+          storage_gb?: number | null
+          tmp_version?: string | null
+          uefi_capable?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
