@@ -130,8 +130,7 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
 
   const downloadExecutable = () => {
     // Create a dynamic executable that includes the session ID
-    const executableContent = `
-@echo off
+    const executableContent = `@echo off
 echo Windows 11 Compatibility Scanner
 echo ================================
 echo.
@@ -154,11 +153,11 @@ try {
     $bios = Get-WmiObject -Class Win32_BIOS
     
     # Get TPM information
-    $tpmVersion = 'Not Detected'
+    $tmpVersion = 'Not Detected'
     try {
-        $tpm = Get-WmiObject -Namespace 'Root\\CIMv2\\Security\\MicrosoftTpm' -Class Win32_Tpm -ErrorAction SilentlyContinue
+        $tpm = Get-WmiObject -Namespace 'Root\\\\CIMv2\\\\Security\\\\MicrosoftTpm' -Class Win32_Tpm -ErrorAction SilentlyContinue
         if ($tpm) {
-            $tpmVersion = '2.0'
+            $tmpVersion = '2.0'
         }
     } catch {
         # TPM not available or accessible
@@ -194,7 +193,7 @@ try {
     # Get DirectX version
     $directxVersion = '11'
     try {
-        $dxdiag = Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\DirectX' -Name Version -ErrorAction SilentlyContinue
+        $dxdiag = Get-ItemProperty 'HKLM:\\\\SOFTWARE\\\\Microsoft\\\\DirectX' -Name Version -ErrorAction SilentlyContinue
         if ($dxdiag.Version -like '*12*') {
             $directxVersion = '12'
         }
@@ -211,7 +210,7 @@ try {
         processor = $processor.Name
         ram = [math]::Round(($memory.Sum / 1GB), 0)
         storage = [math]::Round(($disk.Size / 1GB), 0)
-        tmpVersion = $tpmVersion
+        tmpVersion = $tmpVersion
         secureBootCapable = $secureBootCapable
         uefiCapable = $uefiCapable
         directxVersion = $directxVersion
@@ -241,7 +240,7 @@ try {
 Write-Host ''
 Write-Host 'Press any key to close...'
 $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-";
+`;
 
     const blob = new Blob([executableContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
