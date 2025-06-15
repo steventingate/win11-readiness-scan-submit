@@ -18,6 +18,8 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
   useEffect(() => {
     if (!isWaiting) return;
 
+    console.log('Waiting for scan data with session ID:', sessionId);
+
     const checkForScanData = async () => {
       try {
         const { data, error } = await supabase
@@ -32,7 +34,10 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
           return;
         }
 
+        console.log('Checking for scan data, found:', data?.length || 0, 'records');
+
         if (data && data.length > 0) {
+          console.log('Scan data received:', data[0]);
           const scanData = data[0];
           setScanReceived(true);
           setIsWaiting(false);
@@ -131,8 +136,12 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
   const downloadExecutable = () => {
     // Create a dynamic executable that includes the session ID
     const executableContent = `@echo off
+echo ========================================
 echo Windows 11 Compatibility Scanner
-echo ================================
+echo Helpdesk Computers Professional IT
+echo ========================================
+echo.
+echo Session ID: ${sessionId}
 echo.
 echo Scanning your system...
 echo.
@@ -143,62 +152,88 @@ $sessionId = '${sessionId}'
 $apiUrl = 'https://sfdiidxypdadqspafvlc.supabase.co/functions/v1/submit-system-scan'
 
 try {
-    Write-Host 'Gathering system information...'
+    Write-Host 'Starting system information gathering...' -ForegroundColor Green
     
     # Get system information
+    Write-Host 'Getting computer system info...'
     $computerSystem = Get-WmiObject -Class Win32_ComputerSystem
+    Write-Host 'Getting processor info...'
     $processor = Get-WmiObject -Class Win32_Processor | Select-Object -First 1
+    Write-Host 'Getting memory info...'
     $memory = Get-WmiObject -Class Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum
+    Write-Host 'Getting disk info...'
     $disk = Get-WmiObject -Class Win32_LogicalDisk -Filter 'DriveType=3' | Select-Object -First 1
+    Write-Host 'Getting BIOS info...'
     $bios = Get-WmiObject -Class Win32_BIOS
     
     # Get TPM information
+    Write-Host 'Checking TPM status...'
     $tmpVersion = 'Not Detected'
     try {
         $tpm = Get-WmiObject -Namespace 'Root\\\\CIMv2\\\\Security\\\\MicrosoftTpm' -Class Win32_Tpm -ErrorAction SilentlyContinue
         if ($tpm) {
             $tmpVersion = '2.0'
+            Write-Host 'TPM 2.0 detected' -ForegroundColor Green
+        } else {
+            Write-Host 'TPM not detected' -ForegroundColor Yellow
         }
     } catch {
-        # TPM not available or accessible
+        Write-Host 'Error checking TPM: $_' -ForegroundColor Yellow
     }
     
     # Get display information
+    Write-Host 'Getting display info...'
     $display = Get-WmiObject -Class Win32_VideoController | Select-Object -First 1
     $resolution = '$([System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Width)x$([System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Height)'
     
     # Check UEFI vs Legacy BIOS
+    Write-Host 'Checking firmware type...'
     $uefiCapable = $false
     try {
         $firmwareType = (Get-ComputerInfo).BiosFirmwareType
         if ($firmwareType -eq 'Uefi') {
             $uefiCapable = $true
+            Write-Host 'UEFI firmware detected' -ForegroundColor Green
+        } else {
+            Write-Host 'Legacy BIOS detected' -ForegroundColor Yellow
         }
     } catch {
-        # Fallback method
-        if ($env:firmware_type -eq 'UEFI') {
-            $uefiCapable = $true
-        }
+        Write-Host 'Could not determine firmware type, assuming Legacy BIOS' -ForegroundColor Yellow
     }
     
     # Check Secure Boot capability
+    Write-Host 'Checking Secure Boot...'
     $secureBootCapable = $false
     try {
         $secureBootStatus = Confirm-SecureBootUEFI -ErrorAction SilentlyContinue
         $secureBootCapable = $true
+        Write-Host 'Secure Boot capable' -ForegroundColor Green
     } catch {
-        # Secure Boot not supported or not in UEFI mode
+        Write-Host 'Secure Boot not supported or not in UEFI mode' -ForegroundColor Yellow
     }
     
     # Get DirectX version
+    Write-Host 'Checking DirectX version...'
     $directxVersion = '11'
     try {
         $dxdiag = Get-ItemProperty 'HKLM:\\\\SOFTWARE\\\\Microsoft\\\\DirectX' -Name Version -ErrorAction SilentlyContinue
         if ($dxdiag.Version -like '*12*') {
             $directxVersion = '12'
+            Write-Host 'DirectX 12 detected' -ForegroundColor Green
+        } else {
+            Write-Host 'DirectX 11 or earlier detected' -ForegroundColor Yellow
         }
     } catch {
-        # Default to 11
+        Write-Host 'Could not determine DirectX version, assuming 11' -ForegroundColor Yellow
+    }
+    
+    # Check internet connection
+    Write-Host 'Testing internet connection...'
+    $internetConnection = Test-Connection -ComputerName google.com -Count 1 -Quiet
+    if ($internetConnection) {
+        Write-Host 'Internet connection: Available' -ForegroundColor Green
+    } else {
+        Write-Host 'Internet connection: Not available' -ForegroundColor Red
     }
     
     # Prepare data for submission
@@ -215,30 +250,64 @@ try {
         uefiCapable = $uefiCapable
         directxVersion = $directxVersion
         displayResolution = $resolution
-        internetConnection = Test-Connection -ComputerName google.com -Count 1 -Quiet
+        internetConnection = $internetConnection
     }
     
-    Write-Host 'Sending data to compatibility checker...'
+    Write-Host ''
+    Write-Host 'System Information Summary:' -ForegroundColor Cyan
+    Write-Host 'Manufacturer: ' -NoNewline; Write-Host $systemData.manufacturer -ForegroundColor White
+    Write-Host 'Model: ' -NoNewline; Write-Host $systemData.model -ForegroundColor White
+    Write-Host 'Processor: ' -NoNewline; Write-Host $systemData.processor -ForegroundColor White
+    Write-Host 'RAM: ' -NoNewline; Write-Host $systemData.ram 'GB' -ForegroundColor White
+    Write-Host 'Storage: ' -NoNewline; Write-Host $systemData.storage 'GB' -ForegroundColor White
+    Write-Host 'TPM: ' -NoNewline; Write-Host $systemData.tmpVersion -ForegroundColor White
+    Write-Host ''
+    
+    Write-Host 'Sending data to compatibility checker...' -ForegroundColor Yellow
     
     # Convert to JSON
     $jsonData = $systemData | ConvertTo-Json
+    Write-Host 'JSON payload prepared' -ForegroundColor Green
     
     # Submit to API
-    $response = Invoke-RestMethod -Uri $apiUrl -Method POST -Body $jsonData -ContentType 'application/json' -Headers @{
+    $headers = @{
         'apikey' = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmZGlpZHh5cGRhZHFzcGFmdmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3OTQxMDcsImV4cCI6MjA2NTM3MDEwN30.w61wrEcAZAcxq3qYzaFFL6sX1aL2H5NaUdsJk0XTWJI'
         'Authorization' = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmZGlpZHh5cGRhZHFzcGFmdmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3OTQxMDcsImV4cCI6MjA2NTM3MDEwN30.w61wrEcAZAcxq3qYzaFFL6sX1aL2H5NaUdsJk0XTWJI'
+        'Content-Type' = 'application/json'
     }
     
-    Write-Host 'System scan completed successfully!'
-    Write-Host 'Return to your browser to see the results.'
+    Write-Host 'Submitting to API...' -ForegroundColor Yellow
+    $response = Invoke-RestMethod -Uri $apiUrl -Method POST -Body $jsonData -Headers $headers -TimeoutSec 30
+    
+    Write-Host ''
+    Write-Host 'SUCCESS!' -ForegroundColor Green -BackgroundColor Black
+    Write-Host 'System information sent successfully to Helpdesk Computers.' -ForegroundColor Green
+    Write-Host 'Response: ' -NoNewline; Write-Host ($response | ConvertTo-Json) -ForegroundColor White
+    Write-Host ''
+    Write-Host 'Please return to your web browser to view the compatibility results.' -ForegroundColor Cyan
     
 } catch {
-    Write-Host 'Error occurred during scan:' $_.Exception.Message
-    Write-Host 'Please ensure you have an internet connection and try again.'
+    Write-Host ''
+    Write-Host 'ERROR OCCURRED!' -ForegroundColor Red -BackgroundColor Black
+    Write-Host 'Failed to collect or send system information.' -ForegroundColor Red
+    Write-Host 'Error details: ' -NoNewline; Write-Host $_.Exception.Message -ForegroundColor Yellow
+    Write-Host 'Error type: ' -NoNewline; Write-Host $_.Exception.GetType().Name -ForegroundColor Yellow
+    if ($_.Exception.InnerException) {
+        Write-Host 'Inner error: ' -NoNewline; Write-Host $_.Exception.InnerException.Message -ForegroundColor Yellow
+    }
+    Write-Host ''
+    Write-Host 'Please ensure you have:' -ForegroundColor Cyan
+    Write-Host '- Administrator privileges (Run as Administrator)' -ForegroundColor White
+    Write-Host '- Active internet connection' -ForegroundColor White
+    Write-Host '- Windows PowerShell execution policy allows scripts' -ForegroundColor White
+    Write-Host ''
+    Write-Host 'Contact Helpdesk Computers for assistance if the problem persists.' -ForegroundColor Yellow
 }
 
 Write-Host ''
-Write-Host 'Press any key to close...'
+Write-Host '======================================'
+Write-Host 'Scan completed. Press any key to exit...'
+Write-Host '======================================'
 $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 `;
 
@@ -271,8 +340,8 @@ $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
         <div className="flex items-start gap-3">
           <Badge variant="outline" className="text-xs">2</Badge>
           <div>
-            <p className="font-medium">Run the scanner</p>
-            <p className="text-gray-600">Double-click the downloaded file and allow it to run</p>
+            <p className="font-medium">Run as Administrator</p>
+            <p className="text-gray-600">Right-click the downloaded file and select "Run as administrator"</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
@@ -283,9 +352,9 @@ $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
           </div>
         </div>
       </div>
-      <div className="bg-green-100 p-3 rounded border border-green-200">
-        <p className="text-green-800 text-sm">
-          <strong>No session IDs needed!</strong> The scanner automatically connects to this page.
+      <div className="bg-orange-100 p-3 rounded border border-orange-200">
+        <p className="text-orange-800 text-sm">
+          <strong>Important:</strong> Run as Administrator for accurate hardware detection. The scanner window will stay open to show detailed progress.
         </p>
       </div>
     </div>
@@ -316,7 +385,7 @@ $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
                 Download One-Click Scanner
               </Button>
               <p className="text-xs text-gray-600 mt-2">
-                Compatible with Windows 10/11 • No manual setup required
+                Compatible with Windows 10/11 • Run as Administrator for best results
               </p>
             </div>
           </div>
@@ -325,13 +394,14 @@ $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
             <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
             <div>
               <h3 className="font-semibold text-lg">Waiting for scan results...</h3>
-              <p className="text-gray-600">Please run the downloaded scanner</p>
+              <p className="text-gray-600">Session ID: {sessionId}</p>
+              <p className="text-sm text-gray-500 mt-2">Please run the downloaded scanner as Administrator</p>
             </div>
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-blue-600" />
                 <p className="text-sm text-blue-800">
-                  The scanner will automatically send results to this page
+                  The scanner will automatically send results to this page. Keep this browser tab open.
                 </p>
               </div>
             </div>
