@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -79,7 +78,13 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Computer className="h-8 w-8 text-primary" />
+              {/* Replaced icon with company logo */}
+              <img
+                src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=facearea&w=80&h=80&facepad=2"
+                alt="Helpdesk Computers Logo"
+                className="h-10 w-10 rounded bg-orange-800 object-cover shadow-md"
+                style={{ minWidth: 40, minHeight: 40 }}
+              />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Helpdesk Computers</h1>
                 <p className="text-sm text-gray-600">Windows 11 Compatibility Assessment</p>
