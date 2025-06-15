@@ -14,9 +14,15 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     
-    <!-- ClickOnce Settings -->
+    <!-- ClickOnce Publishing Properties -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishProtocol>ClickOnce</PublishProtocol>
     <PublishUrl>publish\</PublishUrl>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.1</ApplicationVersion>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
@@ -28,15 +34,13 @@
     <SupportUrl>https://helpdeskcomputers.com.au/</SupportUrl>
     <ProductName>Windows 11 System Scanner</ProductName>
     <PublisherName>Helpdesk Computers</PublisherName>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Management" Version="7.0.2" />
-    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
 </Project>
