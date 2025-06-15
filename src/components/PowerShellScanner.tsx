@@ -128,14 +128,130 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
     };
   };
 
-  const downloadScript = () => {
-    const scriptUrl = '/system-scanner.ps1';
+  const downloadExecutable = () => {
+    // Create a dynamic executable that includes the session ID
+    const executableContent = `
+@echo off
+echo Windows 11 Compatibility Scanner
+echo ================================
+echo.
+echo Scanning your system...
+echo.
+
+powershell.exe -ExecutionPolicy Bypass -Command "
+# System Scanner Script
+$sessionId = '${sessionId}'
+$apiUrl = 'https://sfdiidxypdadqspafvlc.supabase.co/functions/v1/submit-system-scan'
+
+try {
+    Write-Host 'Gathering system information...'
+    
+    # Get system information
+    $computerSystem = Get-WmiObject -Class Win32_ComputerSystem
+    $processor = Get-WmiObject -Class Win32_Processor | Select-Object -First 1
+    $memory = Get-WmiObject -Class Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum
+    $disk = Get-WmiObject -Class Win32_LogicalDisk -Filter 'DriveType=3' | Select-Object -First 1
+    $bios = Get-WmiObject -Class Win32_BIOS
+    
+    # Get TPM information
+    $tpmVersion = 'Not Detected'
+    try {
+        $tpm = Get-WmiObject -Namespace 'Root\\CIMv2\\Security\\MicrosoftTpm' -Class Win32_Tpm -ErrorAction SilentlyContinue
+        if ($tpm) {
+            $tpmVersion = '2.0'
+        }
+    } catch {
+        # TPM not available or accessible
+    }
+    
+    # Get display information
+    $display = Get-WmiObject -Class Win32_VideoController | Select-Object -First 1
+    $resolution = '$([System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Width)x$([System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Height)'
+    
+    # Check UEFI vs Legacy BIOS
+    $uefiCapable = $false
+    try {
+        $firmwareType = (Get-ComputerInfo).BiosFirmwareType
+        if ($firmwareType -eq 'Uefi') {
+            $uefiCapable = $true
+        }
+    } catch {
+        # Fallback method
+        if ($env:firmware_type -eq 'UEFI') {
+            $uefiCapable = $true
+        }
+    }
+    
+    # Check Secure Boot capability
+    $secureBootCapable = $false
+    try {
+        $secureBootStatus = Confirm-SecureBootUEFI -ErrorAction SilentlyContinue
+        $secureBootCapable = $true
+    } catch {
+        # Secure Boot not supported or not in UEFI mode
+    }
+    
+    # Get DirectX version
+    $directxVersion = '11'
+    try {
+        $dxdiag = Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\DirectX' -Name Version -ErrorAction SilentlyContinue
+        if ($dxdiag.Version -like '*12*') {
+            $directxVersion = '12'
+        }
+    } catch {
+        # Default to 11
+    }
+    
+    # Prepare data for submission
+    $systemData = @{
+        sessionId = $sessionId
+        manufacturer = $computerSystem.Manufacturer
+        model = $computerSystem.Model
+        serialNumber = $bios.SerialNumber
+        processor = $processor.Name
+        ram = [math]::Round(($memory.Sum / 1GB), 0)
+        storage = [math]::Round(($disk.Size / 1GB), 0)
+        tmpVersion = $tpmVersion
+        secureBootCapable = $secureBootCapable
+        uefiCapable = $uefiCapable
+        directxVersion = $directxVersion
+        displayResolution = $resolution
+        internetConnection = Test-Connection -ComputerName google.com -Count 1 -Quiet
+    }
+    
+    Write-Host 'Sending data to compatibility checker...'
+    
+    # Convert to JSON
+    $jsonData = $systemData | ConvertTo-Json
+    
+    # Submit to API
+    $response = Invoke-RestMethod -Uri $apiUrl -Method POST -Body $jsonData -ContentType 'application/json' -Headers @{
+        'apikey' = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmZGlpZHh5cGRhZHFzcGFmdmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3OTQxMDcsImV4cCI6MjA2NTM3MDEwN30.w61wrEcAZAcxq3qYzaFFL6sX1aL2H5NaUdsJk0XTWJI'
+        'Authorization' = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmZGlpZHh5cGRhZHFzcGFmdmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3OTQxMDcsImV4cCI6MjA2NTM3MDEwN30.w61wrEcAZAcxq3qYzaFFL6sX1aL2H5NaUdsJk0XTWJI'
+    }
+    
+    Write-Host 'System scan completed successfully!'
+    Write-Host 'Return to your browser to see the results.'
+    
+} catch {
+    Write-Host 'Error occurred during scan:' $_.Exception.Message
+    Write-Host 'Please ensure you have an internet connection and try again.'
+}
+
+Write-Host ''
+Write-Host 'Press any key to close...'
+$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+";
+
+    const blob = new Blob([executableContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = scriptUrl;
-    link.download = 'system-scanner.ps1';
+    link.href = url;
+    link.download = 'Windows11Scanner.bat';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     setIsWaiting(true);
   };
 
@@ -143,37 +259,35 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
     <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 space-y-4">
       <h3 className="font-semibold text-blue-800 flex items-center gap-2">
         <Computer className="h-5 w-5" />
-        Accurate Hardware Detection
+        One-Click System Scanner
       </h3>
       <div className="space-y-3 text-sm">
         <div className="flex items-start gap-3">
           <Badge variant="outline" className="text-xs">1</Badge>
           <div>
-            <p className="font-medium">Download the PowerShell script</p>
-            <p className="text-gray-600">Click the download button below to get the scanner script</p>
+            <p className="font-medium">Download the scanner</p>
+            <p className="text-gray-600">Click the download button to get the one-click scanner</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Badge variant="outline" className="text-xs">2</Badge>
           <div>
-            <p className="font-medium">Run as Administrator</p>
-            <p className="text-gray-600">Right-click the downloaded file and select "Run with PowerShell"</p>
+            <p className="font-medium">Run the scanner</p>
+            <p className="text-gray-600">Double-click the downloaded file and allow it to run</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Badge variant="outline" className="text-xs">3</Badge>
           <div>
-            <p className="font-medium">Enter Session ID</p>
-            <p className="text-gray-600">Use this ID when prompted: <code className="bg-gray-200 px-2 py-1 rounded text-xs font-mono">{sessionId}</code></p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3">
-          <Badge variant="outline" className="text-xs">4</Badge>
-          <div>
             <p className="font-medium">Wait for results</p>
             <p className="text-gray-600">Results will appear automatically on this page</p>
           </div>
         </div>
+      </div>
+      <div className="bg-green-100 p-3 rounded border border-green-200">
+        <p className="text-green-800 text-sm">
+          <strong>No session IDs needed!</strong> The scanner automatically connects to this page.
+        </p>
       </div>
     </div>
   );
@@ -183,10 +297,10 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
       <CardHeader className="text-center">
         <CardTitle className="flex items-center justify-center gap-2 text-primary">
           <Computer className="h-6 w-6" />
-          Precise Hardware Analysis
+          One-Click System Scanner
         </CardTitle>
         <CardDescription className="text-gray-700">
-          Get 100% accurate system information using our PowerShell scanner
+          Download and run our automated scanner for instant results
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -195,15 +309,15 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
             <Instructions />
             <div className="text-center">
               <Button 
-                onClick={downloadScript}
+                onClick={downloadExecutable}
                 size="lg"
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Download className="h-5 w-5 mr-2" />
-                Download PowerShell Scanner
+                Download One-Click Scanner
               </Button>
               <p className="text-xs text-gray-600 mt-2">
-                Session ID: <code className="bg-gray-200 px-2 py-1 rounded">{sessionId}</code>
+                Compatible with Windows 10/11 • No manual setup required
               </p>
             </div>
           </div>
@@ -212,14 +326,13 @@ const PowerShellScanner = ({ onScanComplete }: PowerShellScannerProps) => {
             <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
             <div>
               <h3 className="font-semibold text-lg">Waiting for scan results...</h3>
-              <p className="text-gray-600">Please run the downloaded PowerShell script</p>
-              <p className="text-sm text-gray-500 mt-2">Session ID: {sessionId}</p>
+              <p className="text-gray-600">Please run the downloaded scanner</p>
             </div>
-            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
-                <p className="text-sm text-yellow-800">
-                  Make sure to run the script as Administrator and enter the correct Session ID
+                <AlertCircle className="h-5 w-5 text-blue-600" />
+                <p className="text-sm text-blue-800">
+                  The scanner will automatically send results to this page
                 </p>
               </div>
             </div>
