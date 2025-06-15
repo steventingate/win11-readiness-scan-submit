@@ -8,6 +8,7 @@ import UserForm from '@/components/UserForm';
 import DeviceInfoCard from "@/components/DeviceInfoCard";
 import ResultOverviewCard from "@/components/ResultOverviewCard";
 import RequirementsAnalysisCard from "@/components/RequirementsAnalysisCard";
+import PowerShellScanner from '@/components/PowerShellScanner';
 
 export interface SystemInfo {
   processor: string;
@@ -108,18 +109,18 @@ const Index = () => {
             Windows 11 Compatibility Checker
           </h2>
           <p className="text-xl text-orange-100 max-w-2xl mx-auto">
-            Comprehensive system analysis to determine Windows 11 readiness with detailed device information and warranty status
+            Comprehensive system analysis with 100% accurate hardware detection using our PowerShell scanner
           </p>
         </div>
 
         {!scanComplete ? (
-          <SystemScanner onScanComplete={handleScanComplete} />
+          <PowerShellScanner onScanComplete={handleScanComplete} />
         ) : (
           <div className="space-y-6">
             {systemInfo && <DeviceInfoCard systemInfo={systemInfo} />}
             <ResultOverviewCard isCompatible={compatibilityResult?.isCompatible} />
             {compatibilityResult && <RequirementsAnalysisCard compatibilityResult={compatibilityResult} />}
-            {/* Action Buttons remain as before */}
+            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={handleProceedToForm}
