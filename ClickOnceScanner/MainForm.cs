@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Management;
@@ -16,10 +15,10 @@ namespace Win11Scanner
     {
         private readonly string sessionId;
         private readonly HttpClient httpClient;
-        private Label statusLabel;
-        private ProgressBar progressBar;
-        private Button scanButton;
-        private TextBox resultsTextBox;
+        private Label statusLabel = null!;
+        private ProgressBar progressBar = null!;
+        private Button scanButton = null!;
+        private TextBox resultsTextBox = null!;
 
         public MainForm(string sessionId)
         {
@@ -79,13 +78,13 @@ namespace Win11Scanner
             this.Controls.AddRange(new Control[] { titleLabel, statusLabel, progressBar, scanButton, resultsTextBox });
         }
 
-        private async void MainForm_Load(object sender, EventArgs e)
+        private async void MainForm_Load(object? sender, EventArgs e)
         {
             // Auto-start scanning when form loads
             await StartScan();
         }
 
-        private async void ScanButton_Click(object sender, EventArgs e)
+        private async void ScanButton_Click(object? sender, EventArgs e)
         {
             await StartScan();
         }
@@ -142,7 +141,7 @@ namespace Win11Scanner
                     {
                         foreach (ManagementObject obj in searcher.Get())
                         {
-                            systemInfo.Processor = obj["Name"]?.ToString();
+                            systemInfo.Processor = obj["Name"]?.ToString() ?? "Unknown";
                             break;
                         }
                     }
@@ -189,8 +188,8 @@ namespace Win11Scanner
                     {
                         foreach (ManagementObject obj in searcher.Get())
                         {
-                            systemInfo.Manufacturer = obj["Manufacturer"]?.ToString();
-                            systemInfo.Model = obj["Model"]?.ToString();
+                            systemInfo.Manufacturer = obj["Manufacturer"]?.ToString() ?? "Unknown";
+                            systemInfo.Model = obj["Model"]?.ToString() ?? "Unknown";
                             break;
                         }
                     }
@@ -205,7 +204,7 @@ namespace Win11Scanner
                     {
                         foreach (ManagementObject obj in searcher.Get())
                         {
-                            systemInfo.SerialNumber = obj["SerialNumber"]?.ToString();
+                            systemInfo.SerialNumber = obj["SerialNumber"]?.ToString() ?? "Unknown";
                             break;
                         }
                     }
@@ -385,18 +384,18 @@ namespace Win11Scanner
 
     public class SystemInfo
     {
-        public string SessionId { get; set; }
-        public string Processor { get; set; }
+        public string SessionId { get; set; } = string.Empty;
+        public string Processor { get; set; } = string.Empty;
         public int RamGb { get; set; }
         public int StorageGb { get; set; }
-        public string Manufacturer { get; set; }
-        public string Model { get; set; }
-        public string SerialNumber { get; set; }
+        public string Manufacturer { get; set; } = string.Empty;
+        public string Model { get; set; } = string.Empty;
+        public string SerialNumber { get; set; } = string.Empty;
         public bool UefiCapable { get; set; }
-        public string TmpVersion { get; set; }
+        public string TmpVersion { get; set; } = string.Empty;
         public bool SecureBootCapable { get; set; }
-        public string DirectxVersion { get; set; }
-        public string DisplayResolution { get; set; }
+        public string DirectxVersion { get; set; } = string.Empty;
+        public string DisplayResolution { get; set; } = string.Empty;
         public bool InternetConnection { get; set; }
     }
 }
