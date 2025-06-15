@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -135,11 +134,10 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceeScannerProps) => {
   };
 
   const downloadClickOnceApp = () => {
-    // This would link to your ClickOnce application deployment
-    // For now, we'll create a simple executable that users can download
-    const appUrl = 'https://helpdeskcomputers.com.au/tools/Win11Scanner.application';
+    // Use the locally hosted ClickOnce application
+    const appUrl = '/clickonce/Win11Scanner.application';
     
-    // Open the ClickOnce application URL
+    // Open the ClickOnce application URL with session ID
     window.open(`${appUrl}?sessionId=${sessionId}`, '_blank');
     setIsWaiting(true);
   };
@@ -211,14 +209,13 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceeScannerProps) => {
             </div>
             <div className="text-center">
               <p className="text-xs text-gray-500">
-                Don't have the application? 
+                Alternative download: 
                 <a 
-                  href="https://helpdeskcomputers.com.au/tools/Win11Scanner.msi" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  href="/clickonce/win-x64/Win11Scanner.exe" 
+                  download
                   className="text-primary hover:underline ml-1"
                 >
-                  Download installer
+                  Standalone executable
                 </a>
               </p>
             </div>
