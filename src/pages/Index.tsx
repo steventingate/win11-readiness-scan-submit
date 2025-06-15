@@ -1,14 +1,12 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Monitor, Cpu, HardDrive, MemoryStick, Shield, Wifi, CheckCircle, XCircle, Loader2, Computer } from 'lucide-react';
-import SystemScanner from '@/components/SystemScanner';
 import UserForm from '@/components/UserForm';
 import DeviceInfoCard from "@/components/DeviceInfoCard";
 import ResultOverviewCard from "@/components/ResultOverviewCard";
 import RequirementsAnalysisCard from "@/components/RequirementsAnalysisCard";
-import PowerShellScanner from '@/components/PowerShellScanner';
+import ScannerSelector from '@/components/ScannerSelector';
 
 export interface SystemInfo {
   processor: string;
@@ -82,7 +80,6 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              {/* Replaced icon with company logo */}
               <img
                 src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=facearea&w=80&h=80&facepad=2"
                 alt="Helpdesk Computers Logo"
@@ -109,12 +106,12 @@ const Index = () => {
             Windows 11 Compatibility Checker
           </h2>
           <p className="text-xl text-orange-100 max-w-2xl mx-auto">
-            Comprehensive system analysis with 100% accurate hardware detection using our PowerShell scanner
+            Multiple scanning options to assess your system's Windows 11 compatibility
           </p>
         </div>
 
         {!scanComplete ? (
-          <PowerShellScanner onScanComplete={handleScanComplete} />
+          <ScannerSelector onScanComplete={handleScanComplete} />
         ) : (
           <div className="space-y-6">
             {systemInfo && <DeviceInfoCard systemInfo={systemInfo} />}
@@ -158,25 +155,6 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-const getRequirementIcon = (requirement: string) => {
-  switch (requirement) {
-    case 'processor':
-      return <Cpu className="h-5 w-5 text-blue-500" />;
-    case 'ram':
-      return <MemoryStick className="h-5 w-5 text-green-500" />;
-    case 'storage':
-      return <HardDrive className="h-5 w-5 text-purple-500" />;
-    case 'tmp':
-    case 'secureBoot':
-    case 'uefi':
-      return <Shield className="h-5 w-5 text-red-500" />;
-    case 'internet':
-      return <Wifi className="h-5 w-5 text-blue-500" />;
-    default:
-      return <Monitor className="h-5 w-5 text-gray-500" />;
-  }
 };
 
 export default Index;
