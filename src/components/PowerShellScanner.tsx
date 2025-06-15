@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -154,23 +155,23 @@ $apiUrl = 'https://sfdiidxypdadqspafvlc.supabase.co/functions/v1/submit-system-s
 try {
     Write-Host 'Starting system information gathering...' -ForegroundColor Green
     
-    # Get system information
+    # Get system information using CIM (newer than WMI)
     Write-Host 'Getting computer system info...'
-    $computerSystem = Get-WmiObject -Class Win32_ComputerSystem
+    $computerSystem = Get-CimInstance -ClassName Win32_ComputerSystem
     Write-Host 'Getting processor info...'
-    $processor = Get-WmiObject -Class Win32_Processor | Select-Object -First 1
+    $processor = Get-CimInstance -ClassName Win32_Processor | Select-Object -First 1
     Write-Host 'Getting memory info...'
-    $memory = Get-WmiObject -Class Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum
+    $memory = Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum
     Write-Host 'Getting disk info...'
-    $disk = Get-WmiObject -Class Win32_LogicalDisk -Filter 'DriveType=3' | Select-Object -First 1
+    $disk = Get-CimInstance -ClassName Win32_LogicalDisk -Filter 'DriveType=3' | Select-Object -First 1
     Write-Host 'Getting BIOS info...'
-    $bios = Get-WmiObject -Class Win32_BIOS
+    $bios = Get-CimInstance -ClassName Win32_BIOS
     
     # Get TPM information
     Write-Host 'Checking TPM status...'
     $tmpVersion = 'Not Detected'
     try {
-        $tpm = Get-WmiObject -Namespace 'Root\\\\CIMv2\\\\Security\\\\MicrosoftTpm' -Class Win32_Tpm -ErrorAction SilentlyContinue
+        $tpm = Get-CimInstance -Namespace 'Root/CIMv2/Security/MicrosoftTpm' -ClassName Win32_Tpm -ErrorAction SilentlyContinue
         if ($tpm) {
             $tmpVersion = '2.0'
             Write-Host 'TPM 2.0 detected' -ForegroundColor Green
@@ -178,19 +179,26 @@ try {
             Write-Host 'TPM not detected' -ForegroundColor Yellow
         }
     } catch {
-        Write-Host 'Error checking TPM: $_' -ForegroundColor Yellow
+        Write-Host 'Error checking TPM: ' + $_.Exception.Message -ForegroundColor Yellow
     }
     
     # Get display information
     Write-Host 'Getting display info...'
-    $display = Get-WmiObject -Class Win32_VideoController | Select-Object -First 1
-    $resolution = '$([System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Width)x$([System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Height)'
+    $display = Get-CimInstance -ClassName Win32_VideoController | Where-Object { $_.Name -notlike '*Remote*' -and $_.Name -notlike '*Virtual*' } | Select-Object -First 1
+    $resolution = '1920x1080'
+    try {
+        Add-Type -AssemblyName System.Windows.Forms
+        $screen = [System.Windows.Forms.SystemInformation]::PrimaryMonitorSize
+        $resolution = $screen.Width.ToString() + 'x' + $screen.Height.ToString()
+    } catch {
+        Write-Host 'Could not get exact resolution, using default' -ForegroundColor Yellow
+    }
     
     # Check UEFI vs Legacy BIOS
     Write-Host 'Checking firmware type...'
     $uefiCapable = $false
     try {
-        $firmwareType = (Get-ComputerInfo).BiosFirmwareType
+        $firmwareType = (Get-ComputerInfo -Property BiosFirmwareType).BiosFirmwareType
         if ($firmwareType -eq 'Uefi') {
             $uefiCapable = $true
             Write-Host 'UEFI firmware detected' -ForegroundColor Green
@@ -216,7 +224,7 @@ try {
     Write-Host 'Checking DirectX version...'
     $directxVersion = '11'
     try {
-        $dxdiag = Get-ItemProperty 'HKLM:\\\\SOFTWARE\\\\Microsoft\\\\DirectX' -Name Version -ErrorAction SilentlyContinue
+        $dxdiag = Get-ItemProperty 'HKLM:SOFTWARE\Microsoft\DirectX' -Name Version -ErrorAction SilentlyContinue
         if ($dxdiag.Version -like '*12*') {
             $directxVersion = '12'
             Write-Host 'DirectX 12 detected' -ForegroundColor Green
@@ -255,12 +263,12 @@ try {
     
     Write-Host ''
     Write-Host 'System Information Summary:' -ForegroundColor Cyan
-    Write-Host 'Manufacturer: ' -NoNewline; Write-Host $systemData.manufacturer -ForegroundColor White
-    Write-Host 'Model: ' -NoNewline; Write-Host $systemData.model -ForegroundColor White
-    Write-Host 'Processor: ' -NoNewline; Write-Host $systemData.processor -ForegroundColor White
-    Write-Host 'RAM: ' -NoNewline; Write-Host $systemData.ram 'GB' -ForegroundColor White
-    Write-Host 'Storage: ' -NoNewline; Write-Host $systemData.storage 'GB' -ForegroundColor White
-    Write-Host 'TPM: ' -NoNewline; Write-Host $systemData.tmpVersion -ForegroundColor White
+    Write-Host ('Manufacturer: ' + $systemData.manufacturer) -ForegroundColor White
+    Write-Host ('Model: ' + $systemData.model) -ForegroundColor White
+    Write-Host ('Processor: ' + $systemData.processor) -ForegroundColor White
+    Write-Host ('RAM: ' + $systemData.ram + ' GB') -ForegroundColor White
+    Write-Host ('Storage: ' + $systemData.storage + ' GB') -ForegroundColor White
+    Write-Host ('TPM: ' + $systemData.tmpVersion) -ForegroundColor White
     Write-Host ''
     
     Write-Host 'Sending data to compatibility checker...' -ForegroundColor Yellow
@@ -282,7 +290,7 @@ try {
     Write-Host ''
     Write-Host 'SUCCESS!' -ForegroundColor Green -BackgroundColor Black
     Write-Host 'System information sent successfully to Helpdesk Computers.' -ForegroundColor Green
-    Write-Host 'Response: ' -NoNewline; Write-Host ($response | ConvertTo-Json) -ForegroundColor White
+    Write-Host ('Response: ' + ($response | ConvertTo-Json)) -ForegroundColor White
     Write-Host ''
     Write-Host 'Please return to your web browser to view the compatibility results.' -ForegroundColor Cyan
     
@@ -290,10 +298,10 @@ try {
     Write-Host ''
     Write-Host 'ERROR OCCURRED!' -ForegroundColor Red -BackgroundColor Black
     Write-Host 'Failed to collect or send system information.' -ForegroundColor Red
-    Write-Host 'Error details: ' -NoNewline; Write-Host $_.Exception.Message -ForegroundColor Yellow
-    Write-Host 'Error type: ' -NoNewline; Write-Host $_.Exception.GetType().Name -ForegroundColor Yellow
+    Write-Host ('Error details: ' + $_.Exception.Message) -ForegroundColor Yellow
+    Write-Host ('Error type: ' + $_.Exception.GetType().Name) -ForegroundColor Yellow
     if ($_.Exception.InnerException) {
-        Write-Host 'Inner error: ' -NoNewline; Write-Host $_.Exception.InnerException.Message -ForegroundColor Yellow
+        Write-Host ('Inner error: ' + $_.Exception.InnerException.Message) -ForegroundColor Yellow
     }
     Write-Host ''
     Write-Host 'Please ensure you have:' -ForegroundColor Cyan
@@ -309,7 +317,7 @@ Write-Host '======================================'
 Write-Host 'Scan completed. Press any key to exit...'
 Write-Host '======================================'
 $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-`;
+"`;
 
     const blob = new Blob([executableContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
