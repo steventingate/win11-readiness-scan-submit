@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,7 +46,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
     let serialNumber = 'Unknown';
     let processor = 'Unknown';
     let ramGB = 8;
-    let tpmVersion = '2.0'; // Default to 2.0 for modern systems
+    let tmpVersion = '2.0'; // Changed from tpmVersion to tmpVersion
     let secureBootCapable = true; // Default to true for modern systems
     let uefiCapable = true; // Default to true for modern systems
     
@@ -118,7 +117,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
       // Modern systems (2019+) typically have TPM 2.0 and Secure Boot
       const modernSystem = cores >= 6 && ramGB >= 8;
       if (modernSystem) {
-        tpmVersion = '2.0';
+        tmpVersion = '2.0'; // Changed from tpmVersion to tmpVersion
         secureBootCapable = true;
         uefiCapable = true;
       }
@@ -175,7 +174,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
         processor,
         ram: ramGB,
         storage,
-        tpmVersion,
+        tmpVersion, // Changed from tpmVersion to tmpVersion
         secureBootCapable,
         uefiCapable,
         directxVersion: modernSystem ? '12' : '11',
@@ -194,7 +193,7 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
         processor: 'Intel Core i7-1355U',
         ram: 16,
         storage: 512,
-        tpmVersion: '2.0',
+        tmpVersion: '2.0', // Changed from tpmVersion to tmpVersion
         secureBootCapable: true,
         uefiCapable: true,
         directxVersion: '12',
@@ -227,10 +226,10 @@ const SystemScanner = ({ onScanComplete }: SystemScannerProps) => {
         requirement: '64 GB available storage minimum',
         current: `${systemInfo.storage} GB`
       },
-      tpm: {
-        met: systemInfo.tpmVersion === '2.0',
+      tmp: { // Changed from tmp to tmp to match interface
+        met: systemInfo.tmpVersion === '2.0', // Changed from tpmVersion to tmpVersion
         requirement: 'TPM version 2.0 (Trusted Platform Module)',
-        current: systemInfo.tpmVersion === 'Not Detected' ? 'TPM not detected' : `TPM ${systemInfo.tpmVersion}`
+        current: systemInfo.tmpVersion === 'Not Detected' ? 'TPM not detected' : `TPM ${systemInfo.tmpVersion}` // Changed from tpmVersion to tmpVersion
       },
       secureBoot: {
         met: systemInfo.secureBootCapable,
