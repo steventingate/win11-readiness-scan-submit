@@ -21,8 +21,8 @@
     <SelfContained>false</SelfContained>
     <PublishProtocol>ClickOnce</PublishProtocol>
     <PublishUrl>publish\</PublishUrl>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
@@ -30,8 +30,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://helpdeskcomputers.com.au/tools/</InstallUrl>
-    <SupportUrl>https://helpdeskcomputers.com.au/</SupportUrl>
+    <InstallUrl>https://gearedit.com.au/win11/</InstallUrl>
+    <SupportUrl>https://gearedit.com.au/</SupportUrl>
     <ProductName>Windows 11 System Scanner</ProductName>
     <PublisherName>Helpdesk Computers</PublisherName>
     <UseApplicationTrust>false</UseApplicationTrust>
