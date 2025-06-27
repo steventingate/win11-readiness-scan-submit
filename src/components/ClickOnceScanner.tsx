@@ -211,7 +211,7 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceeScannerProps) => {
               <p className="text-xs text-gray-500">
                 Alternative download: 
                 <a 
-                  href="https://gearedit.com.au/win11/win-x64/Win11Scanner.exe" 
+                  href="https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe" 
                   download
                   className="text-primary hover:underline ml-1"
                 >
