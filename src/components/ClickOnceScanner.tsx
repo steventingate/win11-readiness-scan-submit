@@ -73,15 +73,18 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
   }, [isWaiting, sessionId, onScanComplete]);
 
   const downloadStandaloneApp = () => {
-    // Create download URL with session parameter
-    const downloadUrl = `https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe?sessionId=${sessionId}`;
-    console.log('Downloading standalone scanner with URL:', downloadUrl);
-    console.log('Session ID:', sessionId);
+    // Create a custom filename with session ID embedded
+    const customFilename = `Win11Scanner_${sessionId}.exe`;
+    const downloadUrl = `https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe`;
     
-    // Create a temporary link to trigger download
+    console.log('Downloading standalone scanner');
+    console.log('Session ID:', sessionId);
+    console.log('Custom filename:', customFilename);
+    
+    // Create a temporary link to trigger download with custom filename
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = 'Win11Scanner.exe';
+    link.download = customFilename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

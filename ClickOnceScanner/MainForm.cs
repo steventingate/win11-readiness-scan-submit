@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Security.Principal;
+using System.IO;
+using System.Reflection;
 
 namespace Win11Scanner
 {
@@ -20,12 +22,36 @@ namespace Win11Scanner
         private Button scanButton = null!;
         private TextBox resultsTextBox = null!;
 
-        public MainForm(string sessionId)
+        public MainForm(string sessionId = null)
         {
-            this.sessionId = sessionId;
+            this.sessionId = sessionId ?? ExtractSessionIdFromFilename() ?? Guid.NewGuid().ToString();
             this.httpClient = new HttpClient();
             InitializeComponent();
             this.Load += MainForm_Load;
+        }
+
+        private string ExtractSessionIdFromFilename()
+        {
+            try
+            {
+                // Get the current executable path
+                string exePath = Assembly.GetExecutingAssembly().Location;
+                string fileName = Path.GetFileNameWithoutExtension(exePath);
+                
+                // Check if filename contains session ID pattern: Win11Scanner_scan_timestamp_randomstring
+                if (fileName.StartsWith("Win11Scanner_scan_"))
+                {
+                    string sessionPart = fileName.Substring("Win11Scanner_".Length);
+                    return sessionPart;
+                }
+            }
+            catch (Exception ex)
+            {
+                // If extraction fails, we'll use a generated GUID
+                Console.WriteLine($"Failed to extract session ID from filename: {ex.Message}");
+            }
+            
+            return null;
         }
 
         private void InitializeComponent()
