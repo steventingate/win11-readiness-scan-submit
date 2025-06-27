@@ -1,4 +1,3 @@
-
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -24,12 +23,14 @@ namespace Win11Scanner
         public void InitializeUI(string sessionId)
         {
             form.Text = "Windows 11 System Scanner - Helpdesk Computers";
-            form.Size = new Size(700, 600);
+            form.Size = new Size(700, 650);
             form.StartPosition = FormStartPosition.CenterScreen;
             form.FormBorderStyle = FormBorderStyle.FixedDialog;
             form.MaximizeBox = false;
             form.MinimizeBox = true;
-            form.TopMost = true;
+            form.TopMost = false;
+            form.ShowIcon = true;
+            form.ShowInTaskbar = true;
 
             CreateLabels(sessionId);
             CreateProgressBar();
@@ -44,9 +45,9 @@ namespace Win11Scanner
             var titleLabel = new Label
             {
                 Text = "Windows 11 Compatibility Scanner",
-                Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold),
+                Font = new Font("Microsoft Sans Serif", 16F, FontStyle.Bold),
                 Location = new Point(20, 20),
-                Size = new Size(650, 35),
+                Size = new Size(650, 40),
                 TextAlign = ContentAlignment.MiddleCenter,
                 ForeColor = Color.DarkBlue
             };
@@ -55,27 +56,29 @@ namespace Win11Scanner
             {
                 Text = "Professional system analysis by Helpdesk Computers",
                 Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular),
-                Location = new Point(20, 55),
-                Size = new Size(650, 20),
+                Location = new Point(20, 65),
+                Size = new Size(650, 25),
                 TextAlign = ContentAlignment.MiddleCenter,
                 ForeColor = Color.Gray
             };
 
             StatusLabel = new Label
             {
-                Text = $"Session ID: {sessionId}",
-                Location = new Point(20, 90),
-                Size = new Size(650, 20),
-                Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular)
+                Text = $"Session ID: {sessionId} | Status: Ready to scan",
+                Location = new Point(20, 95),
+                Size = new Size(650, 25),
+                Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular),
+                ForeColor = Color.DarkGreen
             };
 
             var instructionLabel = new Label
             {
                 Text = "Click 'Start System Scan' to begin comprehensive hardware analysis",
-                Location = new Point(20, 115),
-                Size = new Size(650, 20),
+                Location = new Point(20, 125),
+                Size = new Size(650, 25),
                 TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.DarkGreen
+                ForeColor = Color.DarkBlue,
+                Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold)
             };
 
             form.Controls.AddRange(new Control[] { titleLabel, subtitleLabel, StatusLabel, instructionLabel });
@@ -85,8 +88,8 @@ namespace Win11Scanner
         {
             ProgressBar = new ProgressBar
             {
-                Location = new Point(20, 145),
-                Size = new Size(650, 25),
+                Location = new Point(20, 160),
+                Size = new Size(650, 30),
                 Style = ProgressBarStyle.Continuous,
                 Minimum = 0,
                 Maximum = 100,
@@ -99,20 +102,22 @@ namespace Win11Scanner
             ScanButton = new Button
             {
                 Text = "Start System Scan",
-                Location = new Point(250, 180),
-                Size = new Size(150, 35),
+                Location = new Point(220, 200),
+                Size = new Size(160, 40),
                 UseVisualStyleBackColor = true,
-                Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold),
-                BackColor = Color.LightBlue
+                Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold),
+                BackColor = Color.LightBlue,
+                ForeColor = Color.DarkBlue
             };
             ScanButton.Click += (s, e) => ScanButtonClick?.Invoke(s, e);
 
             CloseButton = new Button
             {
                 Text = "Close",
-                Location = new Point(420, 180),
-                Size = new Size(100, 35),
+                Location = new Point(400, 200),
+                Size = new Size(100, 40),
                 UseVisualStyleBackColor = true,
+                Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular),
                 Enabled = false
             };
             CloseButton.Click += (s, e) => form.Close();
@@ -122,8 +127,8 @@ namespace Win11Scanner
         {
             ResultsTextBox = new TextBox
             {
-                Location = new Point(20, 230),
-                Size = new Size(650, 300),
+                Location = new Point(20, 250),
+                Size = new Size(650, 350),
                 Multiline = true,
                 ScrollBars = ScrollBars.Vertical,
                 ReadOnly = true,
@@ -152,7 +157,7 @@ namespace Win11Scanner
                 return;
             }
 
-            StatusLabel.Text = status;
+            StatusLabel.Text = $"Status: {status}";
             if (color.HasValue)
                 StatusLabel.ForeColor = color.Value;
         }
@@ -177,6 +182,8 @@ namespace Win11Scanner
             }
 
             ResultsTextBox.AppendText($"{message}\r\n");
+            ResultsTextBox.SelectionStart = ResultsTextBox.Text.Length;
+            ResultsTextBox.ScrollToCaret();
         }
 
         public void ClearResults()
