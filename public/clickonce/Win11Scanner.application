@@ -14,6 +14,13 @@
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="win-x64/Win11Scanner.exe.manifest" size="3072">
       <assemblyIdentity name="Win11Scanner.exe" version="1.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>PLACEHOLDER</dsig:DigestValue>
+      </hash>
     </dependentAssembly>
   </dependency>
 </asmv1:assembly>
