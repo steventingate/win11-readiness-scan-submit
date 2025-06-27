@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Computer } from 'lucide-react';
@@ -101,6 +102,10 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
       window.URL.revokeObjectURL(url);
       
       console.log('Downloaded custom scanner as:', customFilename);
+      
+      // Important: Show instructions to user
+      alert(`Downloaded: ${customFilename}\n\nIMPORTANT: Make sure to run the downloaded file with the session ID in its filename!\n\nThe scanner will automatically detect the session ID from the filename.`);
+      
       setIsWaiting(true);
       
     } catch (error) {
@@ -114,6 +119,11 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
       document.body.removeChild(link);
       setIsWaiting(true);
     }
+  };
+
+  const resetScanner = () => {
+    setIsWaiting(false);
+    setScanReceived(false);
   };
 
   return (
@@ -137,7 +147,17 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
             />
           </div>
         ) : isWaiting ? (
-          <ScanningState sessionId={sessionId} />
+          <div className="space-y-4">
+            <ScanningState sessionId={sessionId} />
+            <div className="text-center">
+              <button
+                onClick={resetScanner}
+                className="text-sm text-gray-600 hover:text-gray-800 underline"
+              >
+                Cancel and start over
+              </button>
+            </div>
+          </div>
         ) : (
           <ScanCompleteState />
         )}

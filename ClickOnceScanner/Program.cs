@@ -24,6 +24,7 @@ namespace Win11Scanner
                 File.WriteAllText(logPath, $"[{DateTime.Now}] SCANNER STARTED\n");
                 File.AppendAllText(logPath, $"[{DateTime.Now}] Executable location: {Assembly.GetExecutingAssembly().Location}\n");
                 File.AppendAllText(logPath, $"[{DateTime.Now}] Working directory: {Environment.CurrentDirectory}\n");
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Command line args: {string.Join(" ", args)}\n");
                 
                 // Second message box to confirm logging
                 MessageBox.Show($"Log file created at:\n{logPath}\n\nStarting Windows Forms...", 
@@ -34,8 +35,8 @@ namespace Win11Scanner
                 
                 File.AppendAllText(logPath, $"[{DateTime.Now}] Windows Forms initialized\n");
                 
-                // Get session ID
-                string sessionId = args.Length > 0 ? args[0] : ExtractSessionIdFromFilename() ?? "DEFAULT_SESSION";
+                // Get session ID - try multiple methods
+                string sessionId = ExtractSessionId(args);
                 File.AppendAllText(logPath, $"[{DateTime.Now}] Session ID: {sessionId}\n");
                 
                 // Third message box before creating form
@@ -76,16 +77,30 @@ namespace Win11Scanner
             }
         }
         
-        private static string ExtractSessionIdFromFilename()
+        private static string ExtractSessionId(string[] args)
         {
             try
             {
+                // Method 1: Check command line arguments
+                if (args.Length > 0)
+                {
+                    return args[0];
+                }
+                
+                // Method 2: Extract from executable filename
                 string exePath = Assembly.GetExecutingAssembly().Location;
                 string fileName = Path.GetFileNameWithoutExtension(exePath);
                 
-                if (fileName.StartsWith("Win11Scanner_scan_"))
+                if (fileName.StartsWith("Win11Scanner_"))
                 {
                     return fileName.Substring("Win11Scanner_".Length);
+                }
+                
+                // Method 3: Check if the executable was renamed with session ID
+                string[] parts = fileName.Split('_');
+                if (parts.Length >= 2 && parts[0] == "Win11Scanner")
+                {
+                    return string.Join("_", parts, 1, parts.Length - 1);
                 }
             }
             catch (Exception ex)
@@ -93,7 +108,7 @@ namespace Win11Scanner
                 MessageBox.Show($"Session ID extraction failed: {ex.Message}", "WARNING", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             
-            return null;
+            return "DEFAULT_SESSION";
         }
     }
 }
