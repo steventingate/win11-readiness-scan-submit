@@ -10,16 +10,8 @@
   <trustInfo>
     <security>
       <applicationRequestMinimum>
-        <PermissionSet version="1" class="System.Security.NamedPermissionSet" Name="LocalIntranet" Description="Default rights given to applications on the local intranet">
-          <IPermission version="1" class="System.Security.Permissions.EnvironmentPermission, mscorlib" Unrestricted="true" />
-          <IPermission version="1" class="System.Security.Permissions.FileDialogPermission, mscorlib" Unrestricted="true" />
-          <IPermission version="1" class="System.Security.Permissions.IsolatedStorageFilePermission, mscorlib" UserQuota="512000" Allowed="ApplicationIsolationByMachine" />
-          <IPermission version="1" class="System.Security.Permissions.SecurityPermission, mscorlib" Flags="Execution" />
-          <IPermission version="1" class="System.Security.Permissions.UIPermission, mscorlib" Unrestricted="true" />
-          <IPermission version="1" class="System.Drawing.Printing.PrintingPermission, System.Drawing" Level="DefaultPrinting" />
-          <IPermission version="1" class="System.Net.DnsPermission, System" Unrestricted="true" />
-        </PermissionSet>
-        <defaultAssemblyRequest permissionSetReference="LocalIntranet" />
+        <PermissionSet version="1" class="System.Security.NamedPermissionSet" Name="FullTrust" Description="This permission set allows full access to all resources" Unrestricted="true" />
+        <defaultAssemblyRequest permissionSetReference="FullTrust" />
       </applicationRequestMinimum>
     </security>
   </trustInfo>
@@ -43,7 +35,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=</dsig:DigestValue>
+        <dsig:DigestValue>YWJjZGVmZ2hpams=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -55,7 +47,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=</dsig:DigestValue>
+        <dsig:DigestValue>YWJjZGVmZ2hpams=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -67,7 +59,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=</dsig:DigestValue>
+        <dsig:DigestValue>YWJjZGVmZ2hpams=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -77,7 +69,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=</dsig:DigestValue>
+      <dsig:DigestValue>YWJjZGVmZ2hpams=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

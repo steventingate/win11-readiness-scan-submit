@@ -12,17 +12,17 @@
     <deploymentProvider codebase="https://gearedit.com.au/win11/public/clickonce/Win11Scanner.application" />
   </deployment>
   <compatibleFrameworks xmlns="urn:schemas-microsoft-com:clickonce.v2">
-    <framework targetVersion="4.5" profile="Full" supportedRuntime="4.0.30319" />
+    <framework targetVersion="4.7.2" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Win11Scanner.exe.manifest" size="4096">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Win11Scanner.exe.manifest" size="7284">
       <assemblyIdentity name="Win11Scanner.exe" version="1.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=</dsig:DigestValue>
+        <dsig:DigestValue>YWJjZGVmZ2hpams=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
