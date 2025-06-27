@@ -72,24 +72,45 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
     return () => clearInterval(interval);
   }, [isWaiting, sessionId, onScanComplete]);
 
-  const downloadStandaloneApp = () => {
-    // Create a custom filename with session ID embedded
-    const customFilename = `Win11Scanner_${sessionId}.exe`;
-    const downloadUrl = `https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe`;
-    
-    console.log('Downloading standalone scanner');
-    console.log('Session ID:', sessionId);
-    console.log('Custom filename:', customFilename);
-    
-    // Create a temporary link to trigger download with custom filename
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = customFilename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    setIsWaiting(true);
+  const downloadStandaloneApp = async () => {
+    try {
+      console.log('Creating custom scanner with session ID:', sessionId);
+      
+      // Fetch the original exe file
+      const response = await fetch('https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe');
+      const blob = await response.blob();
+      
+      // Create a custom filename with session ID
+      const customFilename = `Win11Scanner_${sessionId}.exe`;
+      
+      // Create download link with proper filename
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = customFilename;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      
+      console.log('Downloaded custom scanner as:', customFilename);
+      setIsWaiting(true);
+      
+    } catch (error) {
+      console.error('Error downloading scanner:', error);
+      // Fallback to direct download
+      const link = document.createElement('a');
+      link.href = 'https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe';
+      link.download = `Win11Scanner_${sessionId}.exe`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setIsWaiting(true);
+    }
   };
 
   return (

@@ -22,7 +22,7 @@ const ScannerLauncher = ({ sessionId, onLaunch }: ScannerLauncherProps) => (
     </p>
     <div className="bg-amber-50 p-3 rounded border border-amber-200">
       <p className="text-amber-800 text-sm">
-        <strong>After downloading:</strong> Run the Win11Scanner.exe file and it will automatically scan your system and send the results back to this page.
+        <strong>Important:</strong> Make sure to run the downloaded file with the session ID in its filename. If the filename doesn't include the session ID, please download again.
       </p>
     </div>
   </div>
