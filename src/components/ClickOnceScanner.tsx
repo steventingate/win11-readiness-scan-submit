@@ -73,8 +73,13 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
   }, [isWaiting, sessionId, onScanComplete]);
 
   const downloadClickOnceApp = () => {
+    // Use the correct ClickOnce application URL
     const appUrl = `https://gearedit.com.au/win11/public/clickonce/Win11Scanner.application`;
-    window.open(`${appUrl}?sessionId=${sessionId}`, '_blank');
+    console.log('Launching ClickOnce app with URL:', appUrl);
+    console.log('Session ID:', sessionId);
+    
+    // Open the ClickOnce application with session parameter
+    window.location.href = `${appUrl}?sessionId=${sessionId}`;
     setIsWaiting(true);
   };
 
