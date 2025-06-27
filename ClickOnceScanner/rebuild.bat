@@ -1,6 +1,6 @@
 
 @echo off
-echo Building Win11Scanner with authentication fix...
+echo Building Win11Scanner with full system scanning functionality...
 
 cd /d "%~dp0"
 
@@ -32,6 +32,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo Build successful! 
 echo The updated Win11Scanner.exe is now in the public/clickonce/win-x64 folder
-echo It now includes proper Supabase authentication headers.
+echo It now includes full system scanning and database connectivity.
+echo Test it by running the exe - it should scan your system and send data to the server.
 
 pause

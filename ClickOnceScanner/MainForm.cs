@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Win11Scanner
@@ -10,15 +11,14 @@ namespace Win11Scanner
     {
         private readonly string sessionId;
         private readonly string logPath;
+        private readonly SystemInfoScanner scanner;
+        private readonly DataTransmissionService dataService;
+        private readonly UIManager uiManager;
 
         public MainForm(string sessionId, string logPath)
         {
-            this.sessionId = sessionId ?? "UNKNOWN_SESSION";
+            this.sessionId = sessionId ?? "DEFAULT_SESSION";
             this.logPath = logPath;
-            
-            // IMMEDIATE message box in constructor
-            MessageBox.Show("MainForm constructor called!\n\nAbout to initialize components...", 
-                "MAINFORM CONSTRUCTOR", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
             try
             {
@@ -26,11 +26,22 @@ namespace Win11Scanner
                 
                 InitializeComponent();
                 
-                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm initialized successfully\n");
+                // Initialize services
+                scanner = new SystemInfoScanner();
+                dataService = new DataTransmissionService();
+                uiManager = new UIManager(this);
                 
-                // Message box after successful initialization
-                MessageBox.Show("MainForm initialization complete!\n\nForm should now be visible.", 
-                    "INITIALIZATION COMPLETE", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Wire up events
+                scanner.StatusChanged += status => uiManager.UpdateStatus(status);
+                scanner.ProgressChanged += progress => uiManager.UpdateProgress(progress);
+                scanner.LogMessage += message => uiManager.AppendLog(message);
+                dataService.LogMessage += message => uiManager.AppendLog(message);
+                uiManager.ScanButtonClick += OnScanButtonClick;
+                
+                // Initialize UI
+                uiManager.InitializeUI(this.sessionId);
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm initialized successfully with session: {this.sessionId}\n");
             }
             catch (Exception ex)
             {
@@ -44,117 +55,64 @@ namespace Win11Scanner
         {
             File.AppendAllText(logPath, $"[{DateTime.Now}] InitializeComponent starting\n");
             
-            // Basic form setup
-            this.Text = "Windows 11 Scanner - REBUILD TEST";
-            this.Size = new Size(800, 600);
+            // Basic form setup - minimal for now, UIManager will handle the rest
+            this.Text = "Windows 11 Scanner";
+            this.Size = new Size(700, 650);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = true;
             this.ShowInTaskbar = true;
-            this.TopMost = true;
             this.BackColor = Color.White;
             
-            // Title label
-            var titleLabel = new Label
+            File.AppendAllText(logPath, $"[{DateTime.Now}] InitializeComponent completed\n");
+        }
+        
+        private async void OnScanButtonClick(object sender, EventArgs e)
+        {
+            try
             {
-                Text = "🔥 REBUILT SCANNER - TEST MODE 🔥",
-                Font = new Font("Arial", 16F, FontStyle.Bold),
-                Location = new Point(50, 30),
-                Size = new Size(700, 40),
-                TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.Red,
-                BackColor = Color.Yellow
-            };
-            
-            // Session info
-            var sessionLabel = new Label
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Starting system scan\n");
+                
+                uiManager.SetScanningMode(true);
+                uiManager.ClearResults();
+                uiManager.UpdateStatus("Starting system scan...");
+                uiManager.AppendLog("=== SYSTEM SCAN STARTED ===");
+                
+                // Perform the scan
+                var systemInfo = await scanner.ScanSystemAsync(sessionId);
+                
+                // Display results
+                uiManager.DisplayResults(systemInfo);
+                uiManager.UpdateStatus("Scan completed, sending data...");
+                
+                // Send to server
+                await dataService.SendDataToServerAsync(systemInfo);
+                
+                uiManager.UpdateStatus("Scan completed successfully!", Color.Green);
+                uiManager.AppendLog("=== SCAN COMPLETED SUCCESSFULLY ===");
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Scan completed successfully\n");
+            }
+            catch (Exception ex)
             {
-                Text = $"Session ID: {sessionId}",
-                Font = new Font("Arial", 12F, FontStyle.Bold),
-                Location = new Point(50, 80),
-                Size = new Size(700, 30),
-                TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.Blue
-            };
-            
-            // Big test button
-            var testButton = new Button
+                string error = $"Scan failed: {ex.Message}";
+                uiManager.UpdateStatus(error, Color.Red);
+                uiManager.AppendLog($"ERROR: {error}");
+                File.AppendAllText(logPath, $"[{DateTime.Now}] {error}\n");
+                
+                MessageBox.Show(error, "Scan Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
             {
-                Text = "🚀 CLICK ME TO TEST 🚀",
-                Font = new Font("Arial", 14F, FontStyle.Bold),
-                Location = new Point(250, 130),
-                Size = new Size(300, 60),
-                BackColor = Color.LimeGreen,
-                ForeColor = Color.Black,
-                UseVisualStyleBackColor = false
-            };
-            testButton.Click += (s, e) =>
-            {
-                MessageBox.Show("TEST BUTTON WORKS!\n\nThe scanner is functional!", 
-                    "SUCCESS!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                File.AppendAllText(logPath, $"[{DateTime.Now}] Test button clicked - SUCCESS!\n");
-            };
-            
-            // Status text
-            var statusLabel = new Label
-            {
-                Text = "✅ Scanner rebuilt successfully!\n✅ Form is visible!\n✅ Ready for testing!",
-                Font = new Font("Arial", 12F, FontStyle.Regular),
-                Location = new Point(50, 220),
-                Size = new Size(700, 100),
-                TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.DarkGreen
-            };
-            
-            // Log path info
-            var logLabel = new Label
-            {
-                Text = $"Log file: {logPath}",
-                Font = new Font("Arial", 10F, FontStyle.Regular),
-                Location = new Point(50, 340),
-                Size = new Size(700, 30),
-                TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.Gray
-            };
-            
-            // Close button
-            var closeButton = new Button
-            {
-                Text = "Close Scanner",
-                Font = new Font("Arial", 12F, FontStyle.Regular),
-                Location = new Point(350, 400),
-                Size = new Size(100, 40),
-                BackColor = Color.LightCoral,
-                UseVisualStyleBackColor = false
-            };
-            closeButton.Click += (s, e) => this.Close();
-            
-            // Add all controls
-            this.Controls.AddRange(new Control[] 
-            { 
-                titleLabel, 
-                sessionLabel, 
-                testButton, 
-                statusLabel, 
-                logLabel, 
-                closeButton 
-            });
-            
-            File.AppendAllText(logPath, $"[{DateTime.Now}] All UI components added successfully\n");
+                uiManager.SetScanningMode(false);
+            }
         }
         
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-            
             File.AppendAllText(logPath, $"[{DateTime.Now}] Form OnShown event triggered\n");
-            
-            // Final confirmation message
-            MessageBox.Show("🎉 FORM IS NOW VISIBLE! 🎉\n\nThe rebuilt scanner is working!\nClick the green test button to verify functionality.", 
-                "FORM VISIBLE", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
-            // Force to front again
             this.BringToFront();
             this.Activate();
             this.Focus();
