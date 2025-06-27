@@ -18,7 +18,7 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
   useEffect(() => {
     if (!isWaiting) return;
 
-    console.log('Waiting for ClickOnce scan data with session ID:', sessionId);
+    console.log('Waiting for standalone scanner data with session ID:', sessionId);
 
     const checkForScanData = async () => {
       try {
@@ -72,14 +72,20 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
     return () => clearInterval(interval);
   }, [isWaiting, sessionId, onScanComplete]);
 
-  const downloadClickOnceApp = () => {
-    // Use the correct ClickOnce application URL
-    const appUrl = `https://gearedit.com.au/win11/public/clickonce/Win11Scanner.application`;
-    console.log('Launching ClickOnce app with URL:', appUrl);
+  const downloadStandaloneApp = () => {
+    // Create download URL with session parameter
+    const downloadUrl = `https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe?sessionId=${sessionId}`;
+    console.log('Downloading standalone scanner with URL:', downloadUrl);
     console.log('Session ID:', sessionId);
     
-    // Open the ClickOnce application with session parameter
-    window.location.href = `${appUrl}?sessionId=${sessionId}`;
+    // Create a temporary link to trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'Win11Scanner.exe';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
     setIsWaiting(true);
   };
 
@@ -88,10 +94,10 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
       <CardHeader className="text-center">
         <CardTitle className="flex items-center justify-center gap-2 text-primary">
           <Computer className="h-6 w-6" />
-          ClickOnce System Scanner
+          Standalone System Scanner
         </CardTitle>
         <CardDescription className="text-gray-700">
-          Professional-grade system scanning with full hardware access
+          Professional-grade system scanning with comprehensive hardware analysis
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -100,7 +106,7 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
             <ScannerInstructions />
             <ScannerLauncher 
               sessionId={sessionId} 
-              onLaunch={downloadClickOnceApp} 
+              onLaunch={downloadStandaloneApp} 
             />
           </div>
         ) : isWaiting ? (

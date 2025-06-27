@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 interface ScannerLauncherProps {
   sessionId: string;
@@ -14,22 +14,15 @@ const ScannerLauncher = ({ sessionId, onLaunch }: ScannerLauncherProps) => (
       size="lg"
       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
     >
-      <ExternalLink className="h-5 w-5 mr-2" />
-      Launch System Scanner
+      <Download className="h-5 w-5 mr-2" />
+      Download System Scanner
     </Button>
     <p className="text-xs text-gray-600">
       Session ID: {sessionId}
     </p>
-    <div className="text-center">
-      <p className="text-xs text-gray-500">
-        Alternative download: 
-        <a 
-          href="https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe" 
-          download
-          className="text-primary hover:underline ml-1"
-        >
-          Standalone executable
-        </a>
+    <div className="bg-amber-50 p-3 rounded border border-amber-200">
+      <p className="text-amber-800 text-sm">
+        <strong>After downloading:</strong> Run the Win11Scanner.exe file and it will automatically scan your system and send the results back to this page.
       </p>
     </div>
   </div>
