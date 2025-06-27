@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Computer } from 'lucide-react';
@@ -76,8 +75,12 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
     try {
       console.log('Creating custom scanner with session ID:', sessionId);
       
-      // Fetch the original exe file
-      const response = await fetch('https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe');
+      // Fetch the local exe file from the public directory
+      const response = await fetch('/clickonce/win-x64/Win11Scanner.exe');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+      }
+      
       const blob = await response.blob();
       
       // Create a custom filename with session ID
@@ -102,9 +105,9 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceScannerProps) => {
       
     } catch (error) {
       console.error('Error downloading scanner:', error);
-      // Fallback to direct download
+      // Fallback to direct download from local path
       const link = document.createElement('a');
-      link.href = 'https://gearedit.com.au/win11/public/clickonce/win-x64/Win11Scanner.exe';
+      link.href = '/clickonce/win-x64/Win11Scanner.exe';
       link.download = `Win11Scanner_${sessionId}.exe`;
       document.body.appendChild(link);
       link.click();
