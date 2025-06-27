@@ -9,7 +9,7 @@
         <beforeApplicationStartup />
       </update>
     </subscription>
-    <deploymentProvider codebase="https://gearedit.com.au/win11/Win11Scanner.application" />
+    <deploymentProvider codebase="https://gearedit.com.au/win11/public/clickonce/Win11Scanner.application" />
   </deployment>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="win-x64/Win11Scanner.exe.manifest" size="3072">
