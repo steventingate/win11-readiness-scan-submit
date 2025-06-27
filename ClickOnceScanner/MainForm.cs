@@ -1,4 +1,3 @@
-
 using System;
 using System.Drawing;
 using System.IO;
@@ -14,29 +13,44 @@ namespace Win11Scanner
         private readonly SystemInfoScanner scanner;
         private readonly UIManager uiManager;
         private readonly DataTransmissionService dataService;
+        private readonly string logPath;
 
         public MainForm(string sessionId = null)
         {
+            this.logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Win11Scanner_Log.txt");
+            
             try
             {
+                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm constructor starting\n");
+                
                 this.sessionId = sessionId ?? ExtractSessionIdFromFilename() ?? Guid.NewGuid().ToString();
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Session ID determined: {this.sessionId}\n");
+                
                 this.scanner = new SystemInfoScanner();
                 this.uiManager = new UIManager(this);
                 this.dataService = new DataTransmissionService();
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Components created\n");
                 
                 InitializeComponent();
                 SetupEventHandlers();
                 this.Load += MainForm_Load;
 
-                // Ensure window is visible and on top
+                // Force window properties
                 this.WindowState = FormWindowState.Normal;
                 this.ShowInTaskbar = true;
                 this.Visible = true;
+                this.StartPosition = FormStartPosition.CenterScreen;
+                this.TopMost = true;
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm constructor completed successfully\n");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error initializing scanner: {ex.Message}\n\nDetails: {ex.ToString()}", 
-                    "Scanner Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string error = $"Error initializing scanner: {ex.Message}\n\nDetails: {ex.ToString()}";
+                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm constructor error: {error}\n");
+                MessageBox.Show(error, "Scanner Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -65,11 +79,15 @@ namespace Win11Scanner
         {
             try
             {
+                File.AppendAllText(logPath, $"[{DateTime.Now}] InitializeComponent starting\n");
                 uiManager.InitializeUI(sessionId);
+                File.AppendAllText(logPath, $"[{DateTime.Now}] UI initialized successfully\n");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error creating UI: {ex.Message}", "UI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string error = $"Error creating UI: {ex.Message}";
+                File.AppendAllText(logPath, $"[{DateTime.Now}] UI creation error: {error}\n");
+                MessageBox.Show(error, "UI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -137,25 +155,35 @@ namespace Win11Scanner
         {
             try
             {
+                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm_Load starting\n");
+                
                 // Force window to be visible and on top
                 this.BringToFront();
                 this.Activate();
                 this.Focus();
                 this.TopMost = true;
-                await Task.Delay(100); // Brief delay to ensure window is shown
-                this.TopMost = false; // Don't keep it always on top
+                await Task.Delay(100);
+                this.TopMost = false;
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Window brought to front\n");
                 
                 uiManager.AppendLog($"Scanner initialized with Session ID: {sessionId}");
                 uiManager.AppendLog("Ready to scan your system for Windows 11 compatibility.");
                 uiManager.AppendLog("Application loaded successfully!");
                 
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Log messages added\n");
+                
                 // Show a message box to confirm the app is running
-                MessageBox.Show($"Windows 11 Scanner is now running!\n\nSession ID: {sessionId}\n\nClick 'Start System Scan' to begin.", 
+                MessageBox.Show($"Windows 11 Scanner is now running!\n\nSession ID: {sessionId}\n\nClick 'Start System Scan' to begin.\n\nA log file is being created on your desktop for debugging.", 
                     "Scanner Ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Ready message shown, MainForm_Load completed\n");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error during form load: {ex.Message}", "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string error = $"Error during form load: {ex.Message}";
+                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm_Load error: {error}\n");
+                MessageBox.Show(error, "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
