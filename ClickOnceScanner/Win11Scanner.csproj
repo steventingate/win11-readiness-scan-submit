@@ -13,26 +13,6 @@
     <AssemblyProduct>Win11 Scanner - REBUILT</AssemblyProduct>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <FileVersion>2.0.0.0</FileVersion>
-    
-    <!-- Build Properties -->
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishReadyToRun>false</PublishReadyToRun>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <SelfContained>true</SelfContained>
-    <PublishTrimmed>false</PublishTrimmed>
-    
-    <!-- ClickOnce Publishing Properties -->
-    <PublishProtocol>ClickOnce</PublishProtocol>
-    <PublishUrl>publish\</PublishUrl>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>2.0.0.0</ApplicationVersion>
-    <UpdateEnabled>false</UpdateEnabled>
-    <InstallUrl>https://gearedit.com.au/win11/public/clickonce/</InstallUrl>
-    <SupportUrl>https://gearedit.com.au/</SupportUrl>
-    <ProductName>Windows 11 System Scanner - REBUILT</ProductName>
-    <PublisherName>Helpdesk Computers</PublisherName>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
 
   <ItemGroup>
