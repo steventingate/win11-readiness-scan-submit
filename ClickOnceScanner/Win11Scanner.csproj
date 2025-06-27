@@ -7,32 +7,29 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyTitle>Windows 11 System Scanner</AssemblyTitle>
-    <AssemblyDescription>System compatibility scanner for Windows 11</AssemblyDescription>
+    <AssemblyTitle>Windows 11 System Scanner - REBUILT</AssemblyTitle>
+    <AssemblyDescription>System compatibility scanner for Windows 11 - REBUILT VERSION</AssemblyDescription>
     <AssemblyCompany>Helpdesk Computers</AssemblyCompany>
-    <AssemblyProduct>Win11 Scanner</AssemblyProduct>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyProduct>Win11 Scanner - REBUILT</AssemblyProduct>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
     
-    <!-- ClickOnce Publishing Properties -->
-    <PublishSingleFile>false</PublishSingleFile>
+    <!-- Build Properties -->
+    <PublishSingleFile>true</PublishSingleFile>
     <PublishReadyToRun>false</PublishReadyToRun>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <SelfContained>false</SelfContained>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    
+    <!-- ClickOnce Publishing Properties -->
     <PublishProtocol>ClickOnce</PublishProtocol>
     <PublishUrl>publish\</PublishUrl>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.0</ApplicationVersion>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>2.0.0.0</ApplicationVersion>
+    <UpdateEnabled>false</UpdateEnabled>
     <InstallUrl>https://gearedit.com.au/win11/public/clickonce/</InstallUrl>
     <SupportUrl>https://gearedit.com.au/</SupportUrl>
-    <ProductName>Windows 11 System Scanner</ProductName>
+    <ProductName>Windows 11 System Scanner - REBUILT</ProductName>
     <PublisherName>Helpdesk Computers</PublisherName>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>

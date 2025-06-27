@@ -10,18 +10,15 @@ namespace Win11Scanner
     {
         private readonly string sessionId;
         private readonly string logPath;
-        
-        // Simple UI controls
-        private Label titleLabel;
-        private Label sessionLabel;
-        private Button testButton;
-        private TextBox logTextBox;
-        private Button closeButton;
 
         public MainForm(string sessionId, string logPath)
         {
-            this.sessionId = sessionId ?? Guid.NewGuid().ToString();
+            this.sessionId = sessionId ?? "UNKNOWN_SESSION";
             this.logPath = logPath;
+            
+            // IMMEDIATE message box in constructor
+            MessageBox.Show("MainForm constructor called!\n\nAbout to initialize components...", 
+                "MAINFORM CONSTRUCTOR", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
             try
             {
@@ -30,190 +27,137 @@ namespace Win11Scanner
                 InitializeComponent();
                 
                 File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm initialized successfully\n");
+                
+                // Message box after successful initialization
+                MessageBox.Show("MainForm initialization complete!\n\nForm should now be visible.", 
+                    "INITIALIZATION COMPLETE", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                File.AppendAllText(logPath, $"[{DateTime.Now}] MainForm constructor error: {ex.Message}\n");
-                MessageBox.Show($"Error initializing form: {ex.Message}", "Form Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string error = $"MainForm initialization failed: {ex.Message}";
+                File.AppendAllText(logPath, $"[{DateTime.Now}] {error}\n");
+                MessageBox.Show(error, "MAINFORM ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void InitializeComponent()
         {
-            try
-            {
-                File.AppendAllText(logPath, $"[{DateTime.Now}] InitializeComponent starting\n");
-                
-                // Form properties
-                this.Text = "Windows 11 System Scanner - TEST MODE";
-                this.Size = new Size(600, 500);
-                this.StartPosition = FormStartPosition.CenterScreen;
-                this.FormBorderStyle = FormBorderStyle.FixedDialog;
-                this.MaximizeBox = false;
-                this.MinimizeBox = true;
-                this.ShowInTaskbar = true;
-                this.TopMost = false;
-                
-                // Title label
-                titleLabel = new Label
-                {
-                    Text = "Windows 11 Scanner - Debug Mode",
-                    Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold),
-                    Location = new Point(20, 20),
-                    Size = new Size(550, 30),
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.DarkBlue
-                };
-                
-                // Session label
-                sessionLabel = new Label
-                {
-                    Text = $"Session ID: {sessionId}",
-                    Location = new Point(20, 60),
-                    Size = new Size(550, 20),
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.DarkGreen
-                };
-                
-                // Test button
-                testButton = new Button
-                {
-                    Text = "Test Scanner (Click Me!)",
-                    Location = new Point(200, 90),
-                    Size = new Size(200, 40),
-                    UseVisualStyleBackColor = true,
-                    Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold),
-                    BackColor = Color.LightGreen
-                };
-                testButton.Click += TestButton_Click;
-                
-                // Log text box
-                logTextBox = new TextBox
-                {
-                    Location = new Point(20, 140),
-                    Size = new Size(550, 250),
-                    Multiline = true,
-                    ScrollBars = ScrollBars.Vertical,
-                    ReadOnly = true,
-                    Font = new Font("Consolas", 9F),
-                    BackColor = Color.Black,
-                    ForeColor = Color.LimeGreen
-                };
-                
-                // Close button
-                closeButton = new Button
-                {
-                    Text = "Close Scanner",
-                    Location = new Point(250, 400),
-                    Size = new Size(100, 30),
-                    UseVisualStyleBackColor = true
-                };
-                closeButton.Click += (s, e) => this.Close();
-                
-                // Add controls to form
-                this.Controls.AddRange(new Control[] 
-                { 
-                    titleLabel, 
-                    sessionLabel, 
-                    testButton, 
-                    logTextBox, 
-                    closeButton 
-                });
-                
-                // Initialize log
-                AppendToLog("Windows 11 Scanner initialized successfully!");
-                AppendToLog($"Session ID: {sessionId}");
-                AppendToLog("Click 'Test Scanner' to verify functionality.");
-                AppendToLog($"Debug log file: {logPath}");
-                
-                File.AppendAllText(logPath, $"[{DateTime.Now}] All UI components created successfully\n");
-            }
-            catch (Exception ex)
-            {
-                File.AppendAllText(logPath, $"[{DateTime.Now}] InitializeComponent error: {ex.Message}\n");
-                MessageBox.Show($"Error creating UI: {ex.Message}", "UI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        
-        private void TestButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                File.AppendAllText(logPath, $"[{DateTime.Now}] Test button clicked\n");
-                
-                AppendToLog("=== SCANNER TEST STARTED ===");
-                AppendToLog("Testing system information collection...");
-                
-                // Basic system info test
-                AppendToLog($"Computer Name: {Environment.MachineName}");
-                AppendToLog($"User Name: {Environment.UserName}");
-                AppendToLog($"OS Version: {Environment.OSVersion}");
-                AppendToLog($"Processor Count: {Environment.ProcessorCount}");
-                AppendToLog($"Working Set: {Environment.WorkingSet / 1024 / 1024} MB");
-                
-                AppendToLog("=== TEST COMPLETED SUCCESSFULLY ===");
-                AppendToLog("The scanner is working! This confirms the application can run.");
-                
-                MessageBox.Show(
-                    "Scanner test completed successfully!\n\n" +
-                    "The application is working properly.\n" +
-                    "Check the log window for system information.",
-                    "Test Successful",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                
-                File.AppendAllText(logPath, $"[{DateTime.Now}] Test completed successfully\n");
-            }
-            catch (Exception ex)
-            {
-                string error = $"Test failed: {ex.Message}";
-                File.AppendAllText(logPath, $"[{DateTime.Now}] {error}\n");
-                AppendToLog($"ERROR: {error}");
-                MessageBox.Show(error, "Test Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        
-        private void AppendToLog(string message)
-        {
-            if (logTextBox.InvokeRequired)
-            {
-                logTextBox.Invoke((MethodInvoker)(() => AppendToLog(message)));
-                return;
-            }
+            File.AppendAllText(logPath, $"[{DateTime.Now}] InitializeComponent starting\n");
             
-            logTextBox.AppendText($"{DateTime.Now:HH:mm:ss} - {message}\r\n");
-            logTextBox.SelectionStart = logTextBox.Text.Length;
-            logTextBox.ScrollToCaret();
+            // Basic form setup
+            this.Text = "Windows 11 Scanner - REBUILD TEST";
+            this.Size = new Size(800, 600);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = true;
+            this.ShowInTaskbar = true;
+            this.TopMost = true;
+            this.BackColor = Color.White;
+            
+            // Title label
+            var titleLabel = new Label
+            {
+                Text = "🔥 REBUILT SCANNER - TEST MODE 🔥",
+                Font = new Font("Arial", 16F, FontStyle.Bold),
+                Location = new Point(50, 30),
+                Size = new Size(700, 40),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.Red,
+                BackColor = Color.Yellow
+            };
+            
+            // Session info
+            var sessionLabel = new Label
+            {
+                Text = $"Session ID: {sessionId}",
+                Font = new Font("Arial", 12F, FontStyle.Bold),
+                Location = new Point(50, 80),
+                Size = new Size(700, 30),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.Blue
+            };
+            
+            // Big test button
+            var testButton = new Button
+            {
+                Text = "🚀 CLICK ME TO TEST 🚀",
+                Font = new Font("Arial", 14F, FontStyle.Bold),
+                Location = new Point(250, 130),
+                Size = new Size(300, 60),
+                BackColor = Color.LimeGreen,
+                ForeColor = Color.Black,
+                UseVisualStyleBackColor = false
+            };
+            testButton.Click += (s, e) =>
+            {
+                MessageBox.Show("TEST BUTTON WORKS!\n\nThe scanner is functional!", 
+                    "SUCCESS!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                File.AppendAllText(logPath, $"[{DateTime.Now}] Test button clicked - SUCCESS!\n");
+            };
+            
+            // Status text
+            var statusLabel = new Label
+            {
+                Text = "✅ Scanner rebuilt successfully!\n✅ Form is visible!\n✅ Ready for testing!",
+                Font = new Font("Arial", 12F, FontStyle.Regular),
+                Location = new Point(50, 220),
+                Size = new Size(700, 100),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.DarkGreen
+            };
+            
+            // Log path info
+            var logLabel = new Label
+            {
+                Text = $"Log file: {logPath}",
+                Font = new Font("Arial", 10F, FontStyle.Regular),
+                Location = new Point(50, 340),
+                Size = new Size(700, 30),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.Gray
+            };
+            
+            // Close button
+            var closeButton = new Button
+            {
+                Text = "Close Scanner",
+                Font = new Font("Arial", 12F, FontStyle.Regular),
+                Location = new Point(350, 400),
+                Size = new Size(100, 40),
+                BackColor = Color.LightCoral,
+                UseVisualStyleBackColor = false
+            };
+            closeButton.Click += (s, e) => this.Close();
+            
+            // Add all controls
+            this.Controls.AddRange(new Control[] 
+            { 
+                titleLabel, 
+                sessionLabel, 
+                testButton, 
+                statusLabel, 
+                logLabel, 
+                closeButton 
+            });
+            
+            File.AppendAllText(logPath, $"[{DateTime.Now}] All UI components added successfully\n");
         }
         
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
             
-            try
-            {
-                File.AppendAllText(logPath, $"[{DateTime.Now}] Form shown event triggered\n");
-                
-                // Force to front
-                this.BringToFront();
-                this.Activate();
-                this.Focus();
-                
-                // Show confirmation that form is visible
-                MessageBox.Show(
-                    "Windows 11 Scanner is now visible!\n\n" +
-                    "This confirms the application window is working.\n" +
-                    "Click 'Test Scanner' to verify functionality.",
-                    "Scanner Window Active",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                
-                File.AppendAllText(logPath, $"[{DateTime.Now}] Form visibility confirmed\n");
-            }
-            catch (Exception ex)
-            {
-                File.AppendAllText(logPath, $"[{DateTime.Now}] OnShown error: {ex.Message}\n");
-            }
+            File.AppendAllText(logPath, $"[{DateTime.Now}] Form OnShown event triggered\n");
+            
+            // Final confirmation message
+            MessageBox.Show("🎉 FORM IS NOW VISIBLE! 🎉\n\nThe rebuilt scanner is working!\nClick the green test button to verify functionality.", 
+                "FORM VISIBLE", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
+            // Force to front again
+            this.BringToFront();
+            this.Activate();
+            this.Focus();
         }
     }
 }
