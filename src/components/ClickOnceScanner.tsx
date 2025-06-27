@@ -134,8 +134,8 @@ const ClickOnceScanner = ({ onScanComplete }: ClickOnceeScannerProps) => {
   };
 
   const downloadClickOnceApp = () => {
-    // Use the hosted ClickOnce application at gearedit.com.au
-    const appUrl = `https://gearedit.com.au/win11/Win11Scanner.application`;
+    // Use the updated hosted ClickOnce application URL
+    const appUrl = `https://gearedit.com.au/win11/public/clickonce/Win11Scanner.application`;
     
     // Open the ClickOnce application URL with session ID
     window.open(`${appUrl}?sessionId=${sessionId}`, '_blank');
